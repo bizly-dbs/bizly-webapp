@@ -1,0 +1,99 @@
+import { useState } from 'react'
+import MonthIncomeCard from './IncomeCard'
+import AddButton from './AddButoon'
+
+const Pemasukan = () => {
+  const [incomeData, setIncomeData] = useState({
+    januari: [
+      { 
+        date: '12 /01 / 2025', 
+        nominal: 'Rp. 2.000.000,-', 
+        name: 'Penjualan', 
+        category: 'Penjualan',
+        type: 'Pembayaran'
+      },
+      { 
+        date: '14 /01 / 2025', 
+        nominal: 'Rp. 1.500.000,-', 
+        name: 'Pembayaran DP', 
+        category: 'Pembayaran',
+        type: 'Additional'
+      },
+      { 
+        date: '17 /01 / 2025', 
+        nominal: 'Rp. 450.000,-', 
+        name: 'Penjualan Online', 
+        category: 'Penjualan',
+        type: 'Additional'
+      },
+      { 
+        date: '23 /01 / 2025', 
+        nominal: 'Rp. 1.370.000,-', 
+        name: 'Reward', 
+        category: 'Bonus',
+        type: 'Additional'
+      },
+    ],
+    februari: [
+      { 
+        date: '12 /01 / 2025', 
+        nominal: 'Rp. 2.000.000,-', 
+        name: 'Penjualan', 
+        category: 'Penjualan',
+        type: 'Pembayaran'
+      },
+      { 
+        date: '14 /01 / 2025', 
+        nominal: 'Rp. 1.500.000,-', 
+        name: 'Pembayaran DP', 
+        category: 'Pembayaran',
+        type: 'Additional'
+      },
+      { 
+        date: '17 /01 / 2025', 
+        nominal: 'Rp. 450.000,-', 
+        name: 'Penjualan Online', 
+        category: 'Penjualan',
+        type: 'Additional'
+      },
+    ]
+  })
+
+  const handleUpdateIncome = (month, index, updatedItem) => {
+    setIncomeData(prevData => ({
+      ...prevData,
+      [month.toLowerCase()]: prevData[month.toLowerCase()].map((item, i) => 
+        i === index ? updatedItem : item
+      )
+    }))
+  }
+
+  const handleDeleteIncome = (month, index) => {
+    setIncomeData(prevData => ({
+      ...prevData,
+      [month.toLowerCase()]: prevData[month.toLowerCase()].filter((_, i) => i !== index)
+    }))
+  }
+  
+  return (
+    <div className="max-w-full">
+      <h1 className="text-xl font-semibold mb-4 md:hidden">Pemasukan</h1>
+      
+      <div>
+        {Object.entries(incomeData).map(([month, data]) => (
+          <MonthIncomeCard 
+            key={month} 
+            month={month.charAt(0).toUpperCase() + month.slice(1)} 
+            incomeList={data}
+            onUpdateIncome={handleUpdateIncome}
+            onDeleteIncome={handleDeleteIncome}
+          />
+        ))}
+      </div>
+      
+      <AddButton />
+    </div>
+  )
+}
+
+export default Pemasukan
