@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import MonthIncomeCard from './IncomeCard'
 import AddButton from './AddButoon'
 
@@ -79,6 +79,21 @@ const Pemasukan = () => {
       },
     ]
   })
+
+  // Store income data in localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('incomeData', JSON.stringify(incomeData));
+  }, [incomeData]);
+
+  // Check for search results on component mount
+  useEffect(() => {
+    const searchResults = JSON.parse(localStorage.getItem('searchResults'));
+    if (searchResults) {
+      setIncomeData(searchResults);
+      // Clear search results after displaying them
+      localStorage.removeItem('searchResults');
+    }
+  }, []);
 
   const handleUpdateIncome = (month, index, updatedItem) => {
     setIncomeData(prevData => ({

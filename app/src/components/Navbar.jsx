@@ -92,12 +92,35 @@ const Navbar = ({ isSidebarOpen, toggleSidebar }) => {
   // Handle search submission
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    // Add your search logic here
-    console.log('Search submitted:', e.target.search.value);
+    const searchQuery = e.target.search.value.toLowerCase();
+    
+    // Get all income data from localStorage or your data source
+    const incomeData = JSON.parse(localStorage.getItem('incomeData')) || {};
+    
+    // Search through all months
+    const searchResults = Object.entries(incomeData).reduce((results, [month, items]) => {
+      const matchingItems = items.filter(item => 
+        item.name.toLowerCase().includes(searchQuery) ||
+        item.category.toLowerCase().includes(searchQuery) ||
+        item.productName.toLowerCase().includes(searchQuery) ||
+        item.nominal.toLowerCase().includes(searchQuery) ||
+        item.totalAmount.toLowerCase().includes(searchQuery)
+      );
+      
+      if (matchingItems.length > 0) {
+        results[month] = matchingItems;
+      }
+      return results;
+    }, {});
+    
+    // Store search results in localStorage for access in other components
+    localStorage.setItem('searchResults', JSON.stringify(searchResults));
+    
+    // Navigate to pemasukan page with search results
+    navigate('/pemasukan');
     setShowSearch(false);
   };
   
-  // Check if current route is dashboard or profile
   const isDashboard = location.pathname === '/dashboard' || location.pathname === '/profile';
   
   return (
