@@ -97,6 +97,9 @@ const Navbar = ({ isSidebarOpen, toggleSidebar }) => {
     setShowSearch(false);
   };
   
+  // Check if current route is dashboard
+  const isDashboard = location.pathname === '/dashboard';
+  
   return (
     <div className="bg-white shadow-sm px-4 py-2 flex items-center justify-between relative font-['Poppins']">
       {/* Left side - Menu toggle and Page title */}
@@ -113,34 +116,38 @@ const Navbar = ({ isSidebarOpen, toggleSidebar }) => {
       
       {/* Right side - Search, notifications, help, profile */}
       <div className="flex items-center space-x-4">
-        {/* Search bar */}
-        <div className="relative hidden md:block" ref={searchRef}>
-          <form onSubmit={handleSearchSubmit}>
-            <input
-              type="text"
-              name="search"
-              placeholder="Search..."
-              className="pl-10 pr-4 py-2 bg-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 w-64"
-            />
-            <button 
-              type="button" 
-              onClick={handleSearchClick}
-              className="absolute left-3 top-2.5 text-gray-500"
-            >
-              <SearchIcon fontSize="small" />
-            </button>
-          </form>
-        </div>
-        
-        {/* Mobile search button */}
-        <div ref={searchRef}>
-          <button 
-            className="p-2 rounded-full hover:bg-gray-100 md:hidden"
-            onClick={handleSearchClick}
-          >
-            <SearchIcon fontSize="small" />
-          </button>
-        </div>
+        {/* Search bar - Only show if not on dashboard */}
+        {!isDashboard && (
+          <>
+            <div className="relative hidden md:block" ref={searchRef}>
+              <form onSubmit={handleSearchSubmit}>
+                <input
+                  type="text"
+                  name="search"
+                  placeholder="Search..."
+                  className="pl-10 pr-4 py-2 bg-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 w-64"
+                />
+                <button 
+                  type="button" 
+                  onClick={handleSearchClick}
+                  className="absolute left-3 top-2.5 text-gray-500"
+                >
+                  <SearchIcon fontSize="small" />
+                </button>
+              </form>
+            </div>
+            
+            {/* Mobile search button */}
+            <div ref={searchRef}>
+              <button 
+                className="p-2 rounded-full hover:bg-gray-100 md:hidden"
+                onClick={handleSearchClick}
+              >
+                <SearchIcon fontSize="small" />
+              </button>
+            </div>
+          </>
+        )}
         
         {/* Notification button */}
         <div className="relative" ref={notificationsRef}>
@@ -211,8 +218,8 @@ const Navbar = ({ isSidebarOpen, toggleSidebar }) => {
         </div>
       </div>
       
-      {/* Mobile search overlay */}
-      {showSearch && (
+      {/* Mobile search overlay - Only show if not on dashboard */}
+      {!isDashboard && showSearch && (
         <div className="absolute left-0 top-full w-full bg-white shadow-md p-4 md:hidden z-10" ref={searchRef}>
           <form onSubmit={handleSearchSubmit} className="relative">
             <input

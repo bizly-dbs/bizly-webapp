@@ -9,13 +9,13 @@ import Register from './components/Register';
 import LupaPassword from './components/LupaPassword';
 
 import Dashboard from './pages/Overview/Dashboard';
-import ProfileCard from './pages/profile';
+import ProfileCard from './pages/profile/profile';
 
 import Pemasukan from './pages/pemasukan/Pemasukan';
 import TambahMasuk from './pages/pemasukan/TambahMasuk';
 
 import Pengeluaran from './pages/pengeluaran/pengeluaran';
-import TambahKeluar from './pages/pengeluaran/TamabahKeluar';
+import TambahKeluar from './pages/pengeluaran/TambahKeluar';
 
 function App() {
   return (
