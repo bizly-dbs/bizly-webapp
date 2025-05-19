@@ -1,6 +1,7 @@
 import Users from "../models/userModel";
 import Transactions from "../models/transactionsModel.js";
 import Categories from "../models/categoriesModel.js";
+import { Op } from "sequelize";
 
 export const getTransactions = async (req, res) => {
     try{
@@ -109,5 +110,58 @@ export const getTransactionById = async (req, res) => {
         res.status(200).json(transaction);
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+}
+
+export const filterTransactions = async (req, res) => {
+    const { startDate, endDate, categoryId} = req.query
+    const where = { user_id: req.userId }
+    if(startDate&&endDate){
+        where.transaction_date = {
+            [Op.between]: [new Date(startDate), new Date(endDate)],
+        }
+    }
+    if(categoryId){
+        where.category_id = categoryId
+    }
+    try{
+        const transacton = await Transactions.findAll({
+            where,
+            include: [
+                {
+                    model: Categories,
+                    attributes: ['name']
+                }
+            ],
+            attributes: ['transaction_name', 'amount', 'transaction_date', 'description']
+        })
+        res.status(200).json(transacton)
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
+export const searchTransactions = async (req, res) => {
+    const { keyword } = req.query
+    const where = { user_id: userId }
+    if(keyword){
+        where.transaction_name = {
+            [Op.like]: `%${keyword}%`
+        }
+    }
+    try{
+        const transaction = await Transactions.findAll({
+            where,
+            attributes: ['transaction_name', 'amount', 'transaction_date', 'description'],
+            include: [
+                {
+                    model: Categories,
+                    attributes: ['name']    
+                }
+            ],
+        })
+        res.status(200).json(transaction)
+    } catch (error) {
+        res.status(500).json({ message: error.message })
     }
 }
