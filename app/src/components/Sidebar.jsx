@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import logoImg from '../assets/Bizly-logo.jpeg';
+import logoImg from '../assets/Bizly-logo.png';
 
 // Import Material UI Icons
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -56,8 +56,14 @@ const Sidebar = () => {
         <div className="flex flex-col text-blue-600 min-h-full">
           {/* Logo - Now part of the scrollable area */}
           <div className="flex items-center p-4 border-b border-gray-300 sticky top-0 bg-gray-200 z-10">
-            <img src={logoImg} alt="Bizly Logo" className="h-8 w-8 mr-2" />
-            <span className="font-semibold text-xl">Bizly</span>
+            <div className="h-8 w-8 flex-shrink-0">
+              <img 
+                src={logoImg} 
+                alt="Bizly Logo" 
+                className="h-full w-full object-contain" 
+              />
+            </div>
+            <span className="font-semibold text-xl ml-2">Bizly</span>
           </div>
 
           {/* Main Navigation */}

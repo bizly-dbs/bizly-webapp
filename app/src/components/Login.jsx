@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import logo from '../assets/Bizly-logo.jpeg';
+import logo from '../assets/Bizly-logo.png';
 
 const Login = () => {
   const navigate = useNavigate();

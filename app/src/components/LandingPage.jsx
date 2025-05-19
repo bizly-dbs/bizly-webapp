@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X } from 'lucide-react';
-import logo from "../assets/Bizly-logo.jpeg";
+import logo from "../assets/Bizly-logo.png";
 import illustration from "../assets/Placeholder.png";
 import fitur1 from "../assets/fitur1.png";
 import fitur2 from "../assets/fitur2.png";
