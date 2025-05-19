@@ -93,31 +93,51 @@ const Navbar = ({ isSidebarOpen, toggleSidebar }) => {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     const searchQuery = e.target.search.value.toLowerCase();
+    const currentPath = location.pathname;
     
-    // Get all income data from localStorage or your data source
-    const incomeData = JSON.parse(localStorage.getItem('incomeData')) || {};
+    // Get data based on current page
+    let searchResults = {};
     
-    // Search through all months
-    const searchResults = Object.entries(incomeData).reduce((results, [month, items]) => {
-      const matchingItems = items.filter(item => 
-        item.name.toLowerCase().includes(searchQuery) ||
-        item.category.toLowerCase().includes(searchQuery) ||
-        item.productName.toLowerCase().includes(searchQuery) ||
-        item.nominal.toLowerCase().includes(searchQuery) ||
-        item.totalAmount.toLowerCase().includes(searchQuery)
-      );
-      
-      if (matchingItems.length > 0) {
-        results[month] = matchingItems;
-      }
-      return results;
-    }, {});
+    if (currentPath === '/pemasukan') {
+      // Search income data
+      const incomeData = JSON.parse(localStorage.getItem('incomeData')) || {};
+      searchResults = Object.entries(incomeData).reduce((results, [month, items]) => {
+        const matchingItems = items.filter(item => 
+          item.name.toLowerCase().includes(searchQuery) ||
+          item.category.toLowerCase().includes(searchQuery) ||
+          item.productName?.toLowerCase().includes(searchQuery) ||
+          item.nominal.toLowerCase().includes(searchQuery) ||
+          item.totalAmount?.toLowerCase().includes(searchQuery)
+        );
+        
+        if (matchingItems.length > 0) {
+          results[month] = matchingItems;
+        }
+        return results;
+      }, {});
+    } else if (currentPath === '/pengeluaran') {
+      // Search expense data
+      const expenseData = JSON.parse(localStorage.getItem('expenseData')) || {};
+      searchResults = Object.entries(expenseData).reduce((results, [month, items]) => {
+        const matchingItems = items.filter(item => 
+          item.name.toLowerCase().includes(searchQuery) ||
+          item.category.toLowerCase().includes(searchQuery) ||
+          item.nominal.toLowerCase().includes(searchQuery) ||
+          item.type.toLowerCase().includes(searchQuery)
+        );
+        
+        if (matchingItems.length > 0) {
+          results[month] = matchingItems;
+        }
+        return results;
+      }, {});
+    }
     
-    // Store search results in localStorage for access in other components
+    // Store search results in localStorage
     localStorage.setItem('searchResults', JSON.stringify(searchResults));
     
-    // Navigate to pemasukan page with search results
-    navigate('/pemasukan');
+    // Refresh the current page to show search results
+    window.location.reload();
     setShowSearch(false);
   };
   

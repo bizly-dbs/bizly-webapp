@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import MonthExpenseCard from './ExpenseCard'
 import AddButton from './AddButton'
 
@@ -58,6 +58,21 @@ const Pengeluaran = () => {
       },
     ]
   })
+
+  // Store expense data in localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('expenseData', JSON.stringify(expenseData));
+  }, [expenseData]);
+
+  // Check for search results on component mount
+  useEffect(() => {
+    const searchResults = JSON.parse(localStorage.getItem('searchResults'));
+    if (searchResults) {
+      setExpenseData(searchResults);
+      // Clear search results after displaying them
+      localStorage.removeItem('searchResults');
+    }
+  }, []);
 
   const handleUpdateExpense = (month, index, updatedItem) => {
     setExpenseData(prevData => ({
