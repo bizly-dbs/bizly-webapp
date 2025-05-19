@@ -18,6 +18,9 @@ const TambahMasuk = () => {
     nominal: '',
     transactionName: '',
     category: '',
+    productName: '',
+    quantity: '',
+    totalAmount: ''
   })
   
   const [categories, setCategories] = useState([
@@ -72,7 +75,10 @@ const TambahMasuk = () => {
       nominal: `Rp. ${formData.nominal},-`,
       name: formData.transactionName,
       category: selectedCategory,
-      type: 'Pembayaran'
+      type: 'Pembayaran',
+      productName: formData.productName,
+      quantity: formData.quantity,
+      totalAmount: formData.totalAmount
     }
     
     console.log('New income entry:', newEntry)
@@ -124,6 +130,45 @@ const TambahMasuk = () => {
               value={formData.transactionName}
               onChange={handleChange}
               placeholder="Ketik disini.."
+              className={styles.inputField}
+              required
+            />
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Nama Produk</label>
+            <input
+              type="text"
+              name="productName"
+              value={formData.productName}
+              onChange={handleChange}
+              placeholder="Masukkan nama produk"
+              className={styles.inputField}
+              required
+            />
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Jumlah Terjual</label>
+            <input
+              type="number"
+              name="quantity"
+              value={formData.quantity}
+              onChange={handleChange}
+              placeholder="Masukkan jumlah produk terjual"
+              className={styles.inputField}
+              required
+            />
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Total Penjualan</label>
+            <input
+              type="text"
+              name="totalAmount"
+              value={formData.totalAmount}
+              onChange={handleChange}
+              placeholder="Masukkan total penjualan"
               className={styles.inputField}
               required
             />

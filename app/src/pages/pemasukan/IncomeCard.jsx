@@ -27,7 +27,10 @@ const EditForm = ({ item, onSave, onCancel }) => {
     date: item.date,
     nominal: item.nominal.replace('Rp. ', '').replace(',-', ''),
     name: item.name,
-    category: item.category
+    category: item.category,
+    productName: item.productName,
+    quantity: item.quantity,
+    totalAmount: item.totalAmount.replace('Rp. ', '').replace(',-', '')
   })
 
   const handleSubmit = (e) => {
@@ -37,15 +40,18 @@ const EditForm = ({ item, onSave, onCancel }) => {
       date: editData.date,
       nominal: `Rp. ${editData.nominal},-`,
       name: editData.name,
-      category: editData.category
+      category: editData.category,
+      productName: editData.productName,
+      quantity: editData.quantity,
+      totalAmount: `Rp. ${editData.totalAmount},-`
     })
   }
 
   return (
     <tr className="border-b border-gray-200 bg-blue-50">
-      <td colSpan="5" className="px-4 py-4">
+      <td colSpan="7" className="px-4 py-4">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
               <input
@@ -79,6 +85,33 @@ const EditForm = ({ item, onSave, onCancel }) => {
                 type="text"
                 value={editData.category}
                 onChange={(e) => setEditData({ ...editData, category: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Nama Produk</label>
+              <input
+                type="text"
+                value={editData.productName}
+                onChange={(e) => setEditData({ ...editData, productName: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Jumlah Terjual</label>
+              <input
+                type="number"
+                value={editData.quantity}
+                onChange={(e) => setEditData({ ...editData, quantity: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Total Penjualan</label>
+              <input
+                type="text"
+                value={editData.totalAmount}
+                onChange={(e) => setEditData({ ...editData, totalAmount: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
               />
             </div>
@@ -169,6 +202,9 @@ const IncomeRow = ({ item, onSave, onDelete }) => {
       <td className="px-4 py-4 text-sm font-medium text-gray-900">{item.nominal}</td>
       <td className="px-4 py-4 text-sm text-gray-700">{item.name}</td>
       <td className="px-4 py-4 text-sm text-gray-700">{item.category}</td>
+      <td className="px-4 py-4 text-sm text-gray-700">{item.productName}</td>
+      <td className="px-4 py-4 text-sm text-gray-700">{item.quantity}</td>
+      <td className="px-4 py-4 text-sm text-gray-700">{item.totalAmount}</td>
       <td className="px-4 py-4 text-right relative">
         <button 
           onClick={() => setShowDropdown(!showDropdown)}
@@ -198,6 +234,9 @@ const MonthIncomeCard = ({ month, incomeList, onUpdateIncome, onDeleteIncome }) 
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Nominal</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Nama Transaksi</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Kategori</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Nama Produk</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Jumlah</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Total</th>
               <th className="px-4 py-3 text-right text-sm font-medium text-gray-500"></th>
             </tr>
           </thead>

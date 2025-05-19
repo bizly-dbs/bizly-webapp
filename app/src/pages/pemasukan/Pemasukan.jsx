@@ -10,28 +10,40 @@ const Pemasukan = () => {
         nominal: 'Rp. 2.000.000,-', 
         name: 'Penjualan', 
         category: 'Penjualan',
-        type: 'Pembayaran'
+        type: 'Pembayaran',
+        productName: 'iPhone 14 Pro',
+        quantity: '2',
+        totalAmount: 'Rp. 2.000.000,-'
       },
       { 
         date: '14 /01 / 2025', 
         nominal: 'Rp. 1.500.000,-', 
         name: 'Pembayaran DP', 
         category: 'Pembayaran',
-        type: 'Additional'
+        type: 'Additional',
+        productName: 'MacBook Air M2',
+        quantity: '1',
+        totalAmount: 'Rp. 1.500.000,-'
       },
       { 
         date: '17 /01 / 2025', 
         nominal: 'Rp. 450.000,-', 
         name: 'Penjualan Online', 
         category: 'Penjualan',
-        type: 'Additional'
+        type: 'Additional',
+        productName: 'AirPods Pro',
+        quantity: '3',
+        totalAmount: 'Rp. 450.000,-'
       },
       { 
         date: '23 /01 / 2025', 
         nominal: 'Rp. 1.370.000,-', 
         name: 'Reward', 
         category: 'Bonus',
-        type: 'Additional'
+        type: 'Additional',
+        productName: 'Bonus Penjualan',
+        quantity: '1',
+        totalAmount: 'Rp. 1.370.000,-'
       },
     ],
     februari: [
@@ -40,21 +52,30 @@ const Pemasukan = () => {
         nominal: 'Rp. 2.000.000,-', 
         name: 'Penjualan', 
         category: 'Penjualan',
-        type: 'Pembayaran'
+        type: 'Pembayaran',
+        productName: 'iPhone 14 Pro',
+        quantity: '2',
+        totalAmount: 'Rp. 2.000.000,-'
       },
       { 
         date: '14 /01 / 2025', 
         nominal: 'Rp. 1.500.000,-', 
         name: 'Pembayaran DP', 
         category: 'Pembayaran',
-        type: 'Additional'
+        type: 'Additional',
+        productName: 'MacBook Air M2',
+        quantity: '1',
+        totalAmount: 'Rp. 1.500.000,-'
       },
       { 
         date: '17 /01 / 2025', 
         nominal: 'Rp. 450.000,-', 
         name: 'Penjualan Online', 
         category: 'Penjualan',
-        type: 'Additional'
+        type: 'Additional',
+        productName: 'AirPods Pro',
+        quantity: '3',
+        totalAmount: 'Rp. 450.000,-'
       },
     ]
   })
