@@ -7,6 +7,7 @@ import MonthlySummaryCard from './components/MonthlySummaryCard';
 import CategoryCard from './components/CategoryCard';
 import CalendarCard from './components/CalendarCard';
 import ExpenseTrackingCard from './components/ExpenseTrackingCard';
+import TopCard from './components/TopCard';
 
 const Dashboard = () => {
   // Get current date information
@@ -179,6 +180,7 @@ const Dashboard = () => {
         {/* Middle Column */}
         <div className="md:col-span-1 space-y-6">
           <CategoryCard pieData={pieData} />
+          <TopCard />
         </div>
 
         {/* Right Column */}
