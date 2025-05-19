@@ -76,7 +76,7 @@ const Pemasukan = () => {
   }
   
   return (
-    <div className="max-w-full">
+    <div className="min-h-screen bg-gray-50 p-6 font-['Poppins']">
       <h1 className="text-xl font-semibold mb-4 md:hidden">Pemasukan</h1>
       
       <div>

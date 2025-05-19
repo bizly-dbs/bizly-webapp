@@ -33,35 +33,35 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
+    <div className="min-h-screen bg-gray-100 flex flex-col font-['Poppins']">
       {/* Navbar */}
       <header className="bg-white shadow-md py-4 fixed top-0 w-full z-50">
         <div className="container mx-auto flex justify-between items-center px-6">
           {/* Logo */}
           <div className="flex items-center">
             <img src={logo} alt="DompetIQ Logo" className="h-10 mr-3" />
-            <h1 className="text-2xl font-bold text-blue-600">Bizly</h1>
+            <h1 className="text-2xl font-bold text-[#007AFF] font-700">Bizly</h1>
           </div>
 
           {/* Menu Navigasi */}
           <nav className="hidden md:flex items-center space-x-6">
-            <button onClick={() => scrollToSection("Home")} className="hover:text-blue-500">
+            <button onClick={() => scrollToSection("Home")} className="hover:text-[#007AFF] font-500">
               Home
             </button>
-            <button onClick={() => scrollToSection("Fitur")} className="hover:text-blue-500">
+            <button onClick={() => scrollToSection("Fitur")} className="hover:text-[#007AFF] font-500">
               Tentang
             </button>
-            <button onClick={() => scrollToSection("Tangkapan-Layar")} className="hover:text-blue-500">
+            <button onClick={() => scrollToSection("Tangkapan-Layar")} className="hover:text-[#007AFF] font-500">
               Tangkapan Layar
             </button>
           </nav>
 
           {/* Login & Register */}
           <div className="hidden md:flex space-x-4">
-            <Link to="/login" className="px-4 py-2 text-white bg-blue-600 rounded-lg">
+            <Link to="/login" className="px-4 py-2 text-white bg-[#007AFF] rounded-lg">
               Masuk
             </Link>
-            <Link to="/Register" className="px-4 py-2 text-blue-600 border border-blue-600 rounded-lg">
+            <Link to="/Register" className="px-4 py-2 text-[#007AFF] border border-[#007AFF] rounded-lg">
               Daftar
             </Link>
           </div>
@@ -73,9 +73,9 @@ const LandingPage = () => {
             aria-label="Toggle menu"
           >
             {isMenuOpen ? (
-              <X className="h-6 w-6 text-blue-600" />
+              <X className="h-6 w-6 text-[#007AFF]" />
             ) : (
-              <Menu className="h-6 w-6 text-blue-600" />
+              <Menu className="h-6 w-6 text-[#007AFF]" />
             )}
           </button>
         </div>
@@ -84,20 +84,20 @@ const LandingPage = () => {
         {isMenuOpen && (
           <div className="md:hidden bg-white py-4 px-6 shadow-lg">
             <nav className="flex flex-col space-y-4">
-              <button onClick={() => handleMobileNavClick("Home")} className="text-left py-2 px-4 hover:bg-blue-50 hover:text-blue-600 rounded-lg">
+              <button onClick={() => handleMobileNavClick("Home")} className="text-left py-2 px-4 hover:bg-[#007AFF]/10 hover:text-[#007AFF] rounded-lg">
                 Home
               </button>
-              <button onClick={() => handleMobileNavClick("Fitur")} className="text-left py-2 px-4 hover:bg-blue-50 hover:text-blue-600 rounded-lg">
+              <button onClick={() => handleMobileNavClick("Fitur")} className="text-left py-2 px-4 hover:bg-[#007AFF]/10 hover:text-[#007AFF] rounded-lg">
                 Tentang
               </button>
-              <button onClick={() => handleMobileNavClick("Tangkapan-Layar")} className="text-left py-2 px-4 hover:bg-blue-50 hover:text-blue-600 rounded-lg">
+              <button onClick={() => handleMobileNavClick("Tangkapan-Layar")} className="text-left py-2 px-4 hover:bg-[#007AFF]/10 hover:text-[#007AFF] rounded-lg">
                 Tangkapan Layar
               </button>
               <div className="flex flex-col space-y-2 pt-2 border-t border-gray-200">
-                <Link to="/login" className="py-2 px-4 text-center text-white bg-blue-600 rounded-lg">
+                <Link to="/login" className="py-2 px-4 text-center text-white bg-[#007AFF] rounded-lg">
                   Masuk
                 </Link>
-                <Link to="/Register" className="py-2 px-4 text-center text-blue-600 border border-blue-600 rounded-lg">
+                <Link to="/Register" className="py-2 px-4 text-center text-[#007AFF] border border-[#007AFF] rounded-lg">
                   Daftar
                 </Link>
               </div>
@@ -107,8 +107,8 @@ const LandingPage = () => {
       </header>
 
       {/* Hero Section */}
-      <main id="Home" className="flex-grow flex items-center justify-center bg-blue-50 py-24">
-        <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center px-6">
+      <main id="Home" className="flex-grow flex items-center justify-center bg-[url('/src/assets/background.png')] bg-cover bg-center bg-no-repeat min-h-screen">
+        <div className="container grid grid-cols-1 md:grid-cols-2 gap-12 items-center mx-25 mt-40 mb-30">
           {/* Ilustrasi di kiri */}
           <div className="flex justify-center md:order-1">
             <img src={illustration} alt="Illustration" className="w-full max-w-lg" />
@@ -116,11 +116,11 @@ const LandingPage = () => {
 
           {/* Teks Hero di kanan */}
           <div className="text-center md:text-left md:order-2">
-            <h1 className="text-5xl font-bold text-black leading-tight">
+            <h1 className="text-5xl font-bold text-white leading-tight font-400">
               Atur Keuanganmu <br />
               Lebih Cerdas Dengan Bizly!
             </h1>
-            <p className="mt-4 text-gray-600 text-lg">
+            <p className="mt-4 text-white text-lg font-300">
               Pengelolaan keuangan yang cermat adalah kunci keberlanjutan usaha. Namun,
               banyak pelaku UMKM kesulitan mencatat dan menganalisis keuangan karena
               keterbatasan waktu dan sumber daya. Bizly hadir sebagai solusi digital yang
@@ -130,7 +130,7 @@ const LandingPage = () => {
             </p>
             <Link
               to="/login"
-              className="mt-6 inline-block px-6 py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+              className="mt-6 inline-block px-6 py-3 text-[#007AFF] bg-white rounded-3xl hover:bg-[#007AFF] hover:text-white transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg"
             >
               Masuk
             </Link>
@@ -142,9 +142,9 @@ const LandingPage = () => {
       <section id="Fitur" className="py-32 bg-white">
         <div className="container mx-auto text-center px-6">
           {/* Judul & Deskripsi */}
-          <h3 className="text-xl font-semibold text-blue-600">Kenapa harus Bizly?</h3>
+          <h3 className="text-xl font-semibold text-[#007AFF]">Kenapa harus Bizly?</h3>
           <h2 className="text-5xl font-bold text-black leading-tight mt-2">
-            Kami adalah tim <br /> yang antusias
+            Kami adalah tim yang antusias
           </h2>
           <p className="mt-4 text-gray-600 text-lg max-w-3xl mx-auto">
             Bizly dirancang khusus untuk mendukung kebutuhan keuangan pelaku UMKM.
@@ -156,7 +156,7 @@ const LandingPage = () => {
 
           {/* Tombol */}
           <div className="mt-6">
-            <button className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-semibold flex items-center mx-auto">
+            <button className="bg-[#007AFF] text-white px-6 py-3 rounded-lg text-lg font-semibold flex items-center mx-auto">
               Jelajahi <span className="ml-2">→</span>
             </button>
           </div>
@@ -173,7 +173,7 @@ const LandingPage = () => {
                 berdasarkan kategori atau waktu makin
                 praktis, makin terlindungi.
               </p>
-              <div className="mt-4 h-1 bg-blue-600 w-full"></div>
+              <div className="mt-4 h-1 bg-[#007AFF] w-full"></div>
             </div>
 
             {/* Kartu 2 */}
@@ -185,7 +185,7 @@ const LandingPage = () => {
                 diakses kapan saja tanpa lag — bahkan di
                 perangkat dengan spesifikasi standar
               </p>
-              <div className="mt-4 h-1 bg-blue-600 w-full"></div>
+              <div className="mt-4 h-1 bg-[#007AFF] w-full"></div>
             </div>
 
             {/* Kartu 3 */}
@@ -198,7 +198,7 @@ const LandingPage = () => {
                 pengalaman optimal di semua perangkat
                 dari smartphone hingga desktop.
               </p>
-              <div className="mt-4 h-1 bg-blue-600 w-full"></div>
+              <div className="mt-4 h-1 bg-[#007AFF] w-full"></div>
             </div>
           </div>
         </div>
@@ -208,9 +208,9 @@ const LandingPage = () => {
       <section id="Tangkapan-Layar" className="py-24 bg-gray-50">
         <div className="container mx-auto text-center px-6">
           {/* Judul Section */}
-          <h3 className="text-xl font-semibold text-blue-600">Tangkapan Layar</h3>
+          <h3 className="text-xl font-semibold text-[#007AFF]">Tangkapan Layar</h3>
           <h2 className="text-5xl font-bold text-black leading-tight mt-2">
-            Telusuri fitur-fitur utama <span className="text-blue-600">Bizly</span>
+            Telusuri fitur-fitur utama <span className="text-[#007AFF]">Bizly</span>
           </h2>
 
          
@@ -263,14 +263,14 @@ const LandingPage = () => {
 
       {/* Subscribe Section */}
       <section className="py-16 bg-black text-white">
-        <div className="container mx-auto max-w-4xl px-6 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        <div className="container mx-auto max-w-8xl px-6 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           {/* Teks Subscribe */}
           <div className="text-left">
-            <h3 className="text-lg font-semibold text-blue-500">Subscribe</h3>
+            <h3 className="text-lg font-semibold text-[#007AFF]">Subscribe</h3>
             <h2 className="text-3xl md:text-4xl font-bold leading-tight mt-2">
               Stay in the loop <br />
               and sign up for<br />
-              <span className="underline decoration-blue-500">the Bizly newsletter</span>
+              <span className="underline decoration-[#007AFF]">the Bizly newsletter</span>
             </h2>
           </div>
 
@@ -283,11 +283,11 @@ const LandingPage = () => {
               <input
                 type="email"
                 placeholder="Alamat Email"
-                className="w-full md:w-auto flex-1 px-4 py-2 text-gray-900 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                className="w-full max-w-sm md:w-auto flex-1 px-4 py-2 text-gray-900 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#007AFF]"
               />
               <button
                 type="submit"
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg text-base font-semibold hover:bg-blue-700"
+                className="px-6 py-2 bg-[#007AFF] text-white rounded-lg text-base font-semibold hover:bg-[#007AFF]/90"
               >
                 Subscribe
               </button>

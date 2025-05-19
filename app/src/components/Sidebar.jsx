@@ -42,7 +42,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="h-screen w-64 bg-gray-200 overflow-y-auto">
+    <div className="h-screen w-64 bg-gray-200 overflow-y-auto font-['Poppins']">
       <div className="flex flex-col text-blue-600 min-h-full">
         {/* Logo - Now part of the scrollable area */}
         <div className="flex items-center p-4 border-b border-gray-300 sticky top-0 bg-gray-200 z-10">

@@ -98,7 +98,7 @@ const Navbar = ({ isSidebarOpen, toggleSidebar }) => {
   };
   
   return (
-    <div className="bg-white shadow-sm px-4 py-2 flex items-center justify-between relative">
+    <div className="bg-white shadow-sm px-4 py-2 flex items-center justify-between relative font-['Poppins']">
       {/* Left side - Menu toggle and Page title */}
       <div className="flex items-center">
         <button

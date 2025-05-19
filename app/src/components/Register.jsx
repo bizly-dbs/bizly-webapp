@@ -26,7 +26,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center p-4">
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center p-4 font-['Poppins']">
       <div className="w-full max-w-md">
         <div className="mb-8">
           <Link 

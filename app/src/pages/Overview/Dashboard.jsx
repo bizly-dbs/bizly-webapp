@@ -156,7 +156,7 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="bg-gray-50 p-6 min-h-screen">
+    <div className="bg-gray-50 p-6 min-h-screen font-['Poppins']">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         {/* Total Pengeluaran Card */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
