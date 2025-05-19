@@ -7,11 +7,11 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 const Navbar = ({ isSidebarOpen, toggleSidebar }) => {
   const navigate = useNavigate();
-  const location = useLocation(); // Add location hook to track current route
+  const location = useLocation(); 
   const [showSearch, setShowSearch] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [pageTitle, setPageTitle] = useState('Dashboard'); // State to store current page title
+  const [pageTitle, setPageTitle] = useState('Dashboard'); 
   
   // Create refs for dropdown containers
   const searchRef = useRef(null);
@@ -97,8 +97,8 @@ const Navbar = ({ isSidebarOpen, toggleSidebar }) => {
     setShowSearch(false);
   };
   
-  // Check if current route is dashboard
-  const isDashboard = location.pathname === '/dashboard';
+  // Check if current route is dashboard or profile
+  const isDashboard = location.pathname === '/dashboard' || location.pathname === '/profile';
   
   return (
     <div className="bg-white shadow-sm px-4 py-2 flex items-center justify-between relative font-['Poppins']">
@@ -130,7 +130,7 @@ const Navbar = ({ isSidebarOpen, toggleSidebar }) => {
                 <button 
                   type="button" 
                   onClick={handleSearchClick}
-                  className="absolute left-3 top-2.5 text-gray-500"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
                 >
                   <SearchIcon fontSize="small" />
                 </button>
@@ -229,7 +229,7 @@ const Navbar = ({ isSidebarOpen, toggleSidebar }) => {
               className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               autoFocus
             />
-            <SearchIcon className="absolute left-3 top-2.5 text-gray-500" fontSize="small" />
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" fontSize="small" />
           </form>
         </div>
       )}
