@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import logo from '../assets/Bizly-logo.jpeg';
+import logo from '../assets/Bizly-logo.png';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center p-4">
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center p-4 font-['Poppins']">
       <div className="w-full max-w-md">
         <div className="mb-8">
           <Link 

@@ -11,36 +11,64 @@ const Pemasukan = () => {
         nominal: 'Rp. 2.000.000,-', 
         name: 'Penjualan', 
         category: 'Penjualan',
+<<<<<<< HEAD
         product: 'Produk A',
         quantity: '10',
         type: 'Pembayaran'
+=======
+        type: 'Pembayaran',
+        productName: 'iPhone 14 Pro',
+        quantity: '2',
+        totalAmount: 'Rp. 2.000.000,-'
+>>>>>>> a2492aef632f6cb1cfbd9e009f946d3d9b805022
       },
       { 
         date: '14 /01 / 2025', 
         nominal: 'Rp. 1.500.000,-', 
         name: 'Pembayaran DP', 
         category: 'Pembayaran',
+<<<<<<< HEAD
         product: 'Produk B',
         quantity: '5',
         type: 'Additional'
+=======
+        type: 'Additional',
+        productName: 'MacBook Air M2',
+        quantity: '1',
+        totalAmount: 'Rp. 1.500.000,-'
+>>>>>>> a2492aef632f6cb1cfbd9e009f946d3d9b805022
       },
       { 
         date: '17 /01 / 2025', 
         nominal: 'Rp. 450.000,-', 
         name: 'Penjualan Online', 
         category: 'Penjualan',
+<<<<<<< HEAD
         product: 'Produk C',
         quantity: '3',
         type: 'Additional'
+=======
+        type: 'Additional',
+        productName: 'AirPods Pro',
+        quantity: '3',
+        totalAmount: 'Rp. 450.000,-'
+>>>>>>> a2492aef632f6cb1cfbd9e009f946d3d9b805022
       },
       { 
         date: '23 /01 / 2025', 
         nominal: 'Rp. 1.370.000,-', 
         name: 'Reward', 
         category: 'Bonus',
+<<<<<<< HEAD
         product: 'Produk D',
         quantity: '7',
         type: 'Additional'
+=======
+        type: 'Additional',
+        productName: 'Bonus Penjualan',
+        quantity: '1',
+        totalAmount: 'Rp. 1.370.000,-'
+>>>>>>> a2492aef632f6cb1cfbd9e009f946d3d9b805022
       },
     ],
     februari: [
@@ -49,31 +77,53 @@ const Pemasukan = () => {
         nominal: 'Rp. 2.000.000,-', 
         name: 'Penjualan', 
         category: 'Penjualan',
+<<<<<<< HEAD
         product: 'Produk A',
         quantity: '10',
         type: 'Pembayaran'
+=======
+        type: 'Pembayaran',
+        productName: 'iPhone 14 Pro',
+        quantity: '2',
+        totalAmount: 'Rp. 2.000.000,-'
+>>>>>>> a2492aef632f6cb1cfbd9e009f946d3d9b805022
       },
       { 
         date: '14 /01 / 2025', 
         nominal: 'Rp. 1.500.000,-', 
         name: 'Pembayaran DP', 
         category: 'Pembayaran',
+<<<<<<< HEAD
         product: 'Produk B',
         quantity: '5',
         type: 'Additional'
+=======
+        type: 'Additional',
+        productName: 'MacBook Air M2',
+        quantity: '1',
+        totalAmount: 'Rp. 1.500.000,-'
+>>>>>>> a2492aef632f6cb1cfbd9e009f946d3d9b805022
       },
       { 
         date: '17 /01 / 2025', 
         nominal: 'Rp. 450.000,-', 
         name: 'Penjualan Online', 
         category: 'Penjualan',
+<<<<<<< HEAD
         product: 'Produk C',
         quantity: '3',
         type: 'Additional'
+=======
+        type: 'Additional',
+        productName: 'AirPods Pro',
+        quantity: '3',
+        totalAmount: 'Rp. 450.000,-'
+>>>>>>> a2492aef632f6cb1cfbd9e009f946d3d9b805022
       },
     ]
   })
 
+<<<<<<< HEAD
   const [filteredData, setFilteredData] = useState(null)
   const [categories, setCategories] = useState([])
   const [products, setProducts] = useState([])
@@ -92,6 +142,22 @@ const Pemasukan = () => {
     setCategories([...allCategories])
     setProducts([...allProducts])
   }, [incomeData])
+=======
+  // Store income data in localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('incomeData', JSON.stringify(incomeData));
+  }, [incomeData]);
+
+  // Check for search results on component mount
+  useEffect(() => {
+    const searchResults = JSON.parse(localStorage.getItem('searchResults'));
+    if (searchResults) {
+      setIncomeData(searchResults);
+      // Clear search results after displaying them
+      localStorage.removeItem('searchResults');
+    }
+  }, []);
+>>>>>>> a2492aef632f6cb1cfbd9e009f946d3d9b805022
 
   const handleUpdateIncome = (month, index, updatedItem) => {
     setIncomeData(prevData => ({
@@ -148,7 +214,7 @@ const Pemasukan = () => {
   const displayData = filteredData || incomeData
   
   return (
-    <div className="max-w-full">
+    <div className="min-h-screen bg-gray-50 p-6 font-['Poppins']">
       <h1 className="text-xl font-semibold mb-4 md:hidden">Pemasukan</h1>
       
       <div className="flex flex-col md:flex-row md:gap-6">

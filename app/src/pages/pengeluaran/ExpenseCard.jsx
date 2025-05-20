@@ -191,7 +191,7 @@ const ExpenseRow = ({ item, onSave, onDelete }) => {
 
 const MonthExpenseCard = ({ month, expenseList, onUpdateExpense, onDeleteExpense }) => {
   return (
-    <div className="bg-white rounded-lg shadow-sm mb-6 overflow-hidden">
+    <div className="bg-white rounded-2xl shadow-sm p-4 font-['Poppins'] mb-6 overflow-hidden">
       <h2 className="text-xl font-semibold p-5 text-gray-800">{month}</h2>
       
       <div className="overflow-x-auto">

@@ -1,5 +1,11 @@
 require('dotenv').config();
 const express = require('express');
+const authRoute = require('./routes/authRoute');
+const categoriesRoute = require('./routes/categoriesRoute');
+const transactionRoute = require('./routes/transactionRoute');
+const userRoute = require('./routes/userRoute');
+const transactionProductRoute = require('./routes/transactionProductRoute');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -15,3 +21,10 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+// routes
+app.use('/auth', authRoute)
+app.use('/categories', categoriesRoute)
+app.use('/transactions', transactionRoute)
+app.use('/users', userRoute)
+app.use('/transactions-products', transactionProductRoute)

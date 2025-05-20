@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import logoImg from '../assets/Bizly-logo.jpeg';
+import logoImg from '../assets/Bizly-logo.png';
 
 // Import Material UI Icons
 import DashboardIcon from '@mui/icons-material/Dashboard';

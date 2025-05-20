@@ -1,7 +1,13 @@
+<<<<<<< HEAD
 import { useState, useEffect } from 'react';
 import MonthExpenseCard from './ExpenseCard';
 import AddButton from './AddButton';
 import ExpenseFilter from './ExpenseFilter';
+=======
+import { useState, useEffect } from 'react'
+import MonthExpenseCard from './ExpenseCard'
+import AddButton from './AddButton'
+>>>>>>> a2492aef632f6cb1cfbd9e009f946d3d9b805022
 
 const Pengeluaran = () => {
   const [expenseData, setExpenseData] = useState({
@@ -82,6 +88,21 @@ const Pengeluaran = () => {
     }
   }, [expenseData, activeFilter]);
 
+  // Store expense data in localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('expenseData', JSON.stringify(expenseData));
+  }, [expenseData]);
+
+  // Check for search results on component mount
+  useEffect(() => {
+    const searchResults = JSON.parse(localStorage.getItem('searchResults'));
+    if (searchResults) {
+      setExpenseData(searchResults);
+      // Clear search results after displaying them
+      localStorage.removeItem('searchResults');
+    }
+  }, []);
+
   const handleUpdateExpense = (month, index, updatedItem) => {
     setExpenseData(prevData => ({
       ...prevData,
@@ -148,7 +169,7 @@ const Pengeluaran = () => {
   };
   
   return (
-    <div className="max-w-full">
+    <div className="min-h-screen bg-gray-50 p-6 font-['Poppins']">
       <h1 className="text-xl font-semibold mb-4 md:hidden">Pengeluaran</h1>
       
       <div className="flex flex-col md:flex-row md:gap-6">
