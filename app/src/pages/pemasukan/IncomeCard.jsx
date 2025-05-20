@@ -27,7 +27,9 @@ const EditForm = ({ item, onSave, onCancel }) => {
     date: item.date,
     nominal: item.nominal.replace('Rp. ', '').replace(',-', ''),
     name: item.name,
-    category: item.category
+    category: item.category,
+    product: item.product || '',
+    quantity: item.quantity || ''
   })
 
   const handleSubmit = (e) => {
@@ -37,15 +39,17 @@ const EditForm = ({ item, onSave, onCancel }) => {
       date: editData.date,
       nominal: `Rp. ${editData.nominal},-`,
       name: editData.name,
-      category: editData.category
+      category: editData.category,
+      product: editData.product,
+      quantity: editData.quantity
     })
   }
 
   return (
     <tr className="border-b border-gray-200 bg-blue-50">
-      <td colSpan="5" className="px-4 py-4">
+      <td colSpan="7" className="px-4 py-4">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
               <input
@@ -82,6 +86,25 @@ const EditForm = ({ item, onSave, onCancel }) => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Produk</label>
+              <input
+                type="text"
+                value={editData.product}
+                onChange={(e) => setEditData({ ...editData, product: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Jumlah</label>
+              <input
+                type="number"
+                value={editData.quantity}
+                onChange={(e) => setEditData({ ...editData, quantity: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                min="1"
+              />
+            </div>
           </div>
           <div className="flex justify-end gap-2">
             <button
@@ -107,7 +130,7 @@ const EditForm = ({ item, onSave, onCancel }) => {
 const DeleteConfirmation = ({ onConfirm, onCancel }) => {
   return (
     <tr className="border-b border-gray-200 bg-red-50">
-      <td colSpan="5" className="px-4 py-4">
+      <td colSpan="7" className="px-4 py-4">
         <div className="text-center">
           <p className="text-gray-800 mb-4">Apakah Anda yakin ingin menghapus data ini?</p>
           <div className="flex justify-center gap-2">
@@ -169,6 +192,8 @@ const IncomeRow = ({ item, onSave, onDelete }) => {
       <td className="px-4 py-4 text-sm font-medium text-gray-900">{item.nominal}</td>
       <td className="px-4 py-4 text-sm text-gray-700">{item.name}</td>
       <td className="px-4 py-4 text-sm text-gray-700">{item.category}</td>
+      <td className="px-4 py-4 text-sm text-gray-700">{item.product || '-'}</td>
+      <td className="px-4 py-4 text-sm text-gray-700">{item.quantity || '-'}</td>
       <td className="px-4 py-4 text-right relative">
         <button 
           onClick={() => setShowDropdown(!showDropdown)}
@@ -198,6 +223,8 @@ const MonthIncomeCard = ({ month, incomeList, onUpdateIncome, onDeleteIncome }) 
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Nominal</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Nama Transaksi</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Kategori</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Produk</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Jumlah</th>
               <th className="px-4 py-3 text-right text-sm font-medium text-gray-500"></th>
             </tr>
           </thead>
@@ -218,4 +245,3 @@ const MonthIncomeCard = ({ month, incomeList, onUpdateIncome, onDeleteIncome }) 
 }
 
 export default MonthIncomeCard
-

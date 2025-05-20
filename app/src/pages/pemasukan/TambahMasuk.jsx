@@ -1,6 +1,7 @@
+
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Calendar, Plus } from 'lucide-react'
+import { Calendar, Plus, ChevronDown } from 'lucide-react'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
 
@@ -8,7 +9,8 @@ const styles = {
   btn: "px-4 py-2 text-sm font-medium transition-colors rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2",
   btnPrimary: "bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-400",
   btnSecondary: "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-gray-500",
-  inputField: "w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+  inputField: "w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+  dropdown: "w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10 appearance-none cursor-pointer"
 }
 
 const TambahMasuk = () => {
@@ -18,6 +20,8 @@ const TambahMasuk = () => {
     nominal: '',
     transactionName: '',
     category: '',
+    product: '',
+    quantity: ''
   })
   
   const [categories, setCategories] = useState([
@@ -26,7 +30,17 @@ const TambahMasuk = () => {
     { id: 3, name: 'Penjualan Online', selected: false },
   ])
   
+  // Sample products for the dropdown
+  const [products, setProducts] = useState([
+    { id: 1, name: 'Iphone 14 pro' },
+    { id: 2, name: 'Xiomi 14T' },
+    { id: 3, name: 'Samsung A56' },
+    { id: 4, name: 'Xiomi 13t' },
+  ])
+  
   const [newCategory, setNewCategory] = useState('')
+  const [newProduct, setNewProduct] = useState('')
+  const [isAddingProduct, setIsAddingProduct] = useState(false)
   
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -56,6 +70,22 @@ const TambahMasuk = () => {
     }
   }
   
+  const handleAddProduct = () => {
+    if (newProduct.trim()) {
+      const newId = Math.max(...products.map(p => p.id), 0) + 1
+      setProducts([
+        ...products,
+        { id: newId, name: newProduct }
+      ])
+      setFormData({
+        ...formData,
+        product: newProduct
+      })
+      setNewProduct('')
+      setIsAddingProduct(false)
+    }
+  }
+  
   const handleSubmit = (e) => {
     e.preventDefault()
     
@@ -72,6 +102,8 @@ const TambahMasuk = () => {
       nominal: `Rp. ${formData.nominal},-`,
       name: formData.transactionName,
       category: selectedCategory,
+      product: formData.product,
+      quantity: formData.quantity,
       type: 'Pembayaran'
     }
     
@@ -123,6 +155,80 @@ const TambahMasuk = () => {
             value={formData.transactionName}
             onChange={handleChange}
             placeholder="Ketik disini.."
+            className={styles.inputField}
+            required
+          />
+        </div>
+        
+        {/* Product selection dropdown */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Produk</label>
+          {!isAddingProduct ? (
+            <div className="relative">
+              <select
+                name="product"
+                value={formData.product}
+                onChange={handleChange}
+                className={styles.dropdown}
+                required
+              >
+                <option value="">Pilih Produk</option>
+                {products.map(product => (
+                  <option key={product.id} value={product.name}>
+                    {product.name}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown 
+                size={20} 
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none" 
+              />
+              <button
+                type="button"
+                onClick={() => setIsAddingProduct(true)}
+                className="absolute right-12 top-1/2 transform -translate-y-1/2 text-blue-500 hover:text-blue-600"
+              >
+                <Plus size={20} />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={newProduct}
+                onChange={(e) => setNewProduct(e.target.value)}
+                placeholder="Nama produk baru"
+                className="border border-gray-300 rounded-md px-3 py-2 text-sm flex-1"
+                autoFocus
+              />
+              <button
+                type="button"
+                onClick={handleAddProduct}
+                className={`${styles.btn} ${styles.btnPrimary}`}
+              >
+                Tambah
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsAddingProduct(false)}
+                className={`${styles.btn} ${styles.btnSecondary}`}
+              >
+                Batal
+              </button>
+            </div>
+          )}
+        </div>
+        
+        {/* Quantity field */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Jumlah Produk</label>
+          <input
+            type="number"
+            name="quantity"
+            value={formData.quantity}
+            onChange={handleChange}
+            placeholder="Masukkan jumlah"
+            min="1"
             className={styles.inputField}
             required
           />
@@ -194,4 +300,3 @@ const TambahMasuk = () => {
 }
 
 export default TambahMasuk
-

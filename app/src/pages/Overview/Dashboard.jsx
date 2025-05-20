@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
-import { BarChart, Bar, XAxis, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { LineChart, Line } from 'recharts';
+import TotalExpenseCard from './components/TotalExpenseCard';
+import TotalIncomeCard from './components/TotalIncomeCard';
+import NetProfitCard from './components/NetProfitCard';
+import CashFlowCard from './components/CashFlowCard';
+import MonthlySummaryCard from './components/MonthlySummaryCard';
+import CategoryCard from './components/CategoryCard';
+import CalendarCard from './components/CalendarCard';
+import ExpenseTrackingCard from './components/ExpenseTrackingCard';
+import TopCard from './components/TopCard';
 
 const Dashboard = () => {
   // Get current date information
@@ -156,262 +163,43 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="bg-gray-50 p-6 min-h-screen">
+    <div className="bg-gray-50 p-6 min-h-screen font-['Poppins']">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        {/* Total Pengeluaran Card */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm">
-          <div className="mb-4">
-            <h3 className="text-gray-500 text-sm font-medium">Total Pengeluaran</h3>
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Rp. 2.513.000,-</h2>
-              <div className="flex-shrink-0">
-                <div className="h-16">
-                  <ResponsiveContainer width={80} height="100%">
-                    <BarChart data={monthlyData.slice(0, 4)}>
-                      <Bar dataKey="value" fill="#0080FF" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Total Pemasukan Card */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm">
-          <div className="mb-4">
-            <h3 className="text-gray-500 text-sm font-medium">Total Pemasukan</h3>
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Rp. 5.791.000,-</h2>
-              <div className="flex-shrink-0">
-                <div className="h-16">
-                  <ResponsiveContainer width={80} height="100%">
-                    <BarChart data={monthlyData.slice(0, 4)}>
-                      <Bar dataKey="value" fill="#0080FF" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Net Profit/Loss Card */}
-        <div className="bg-blue-500 rounded-2xl p-6 text-white shadow-sm">
-          <div className="mb-4">
-            <h3 className="text-white text-sm font-medium opacity-90">Net Profit/Loss</h3>
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Rp. 5.791.000,-</h2>
-              <div className="flex-shrink-0">
-                <div className="h-16">
-                  <ResponsiveContainer width={80} height="100%">
-                    <LineChart data={lineData}>
-                      <Line 
-                        type="monotone" 
-                        dataKey="value" 
-                        stroke="#FFFFFF" 
-                        strokeWidth={2}
-                        dot={false}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <TotalExpenseCard monthlyData={monthlyData} />
+        <TotalIncomeCard monthlyData={monthlyData} />
+        <NetProfitCard lineData={lineData} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Left Column */}
         <div className="md:col-span-1 space-y-6">
-          {/* Track Arus Kas */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <div className="mb-2">
-              <div className="flex items-center justify-between">
-                <h3 className="text-gray-500 text-sm font-medium">Track Arus Kas</h3>
-                <span className="text-green-500 text-xs font-medium">+2.45%</span>
-              </div>
-              <h2 className="text-2xl font-bold">Rp.-</h2>
-              <div className="flex items-center mt-1">
-                <div className="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
-                <span className="text-xs text-green-500">On track</span>
-              </div>
-            </div>
-            <div className="h-32">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={lineData}>
-                  <Line 
-                    type="monotone" 
-                    dataKey="value" 
-                    stroke="#0080FF" 
-                    strokeWidth={2}
-                    dot={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Ringkasan Monthly Bar Chart */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <h3 className="text-gray-500 text-sm font-medium mb-4">Ringkasan</h3>
-            <div className="flex justify-center items-center mb-2">
-              <div className="bg-blue-100 rounded-full px-3 py-1 text-xs text-blue-600">
-                Rp 1.350.000
-              </div>
-            </div>
-            <div className="h-56">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={monthlyData}>
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10 }} />
-                  <Bar dataKey="value" fill="#0080FF" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+          <CashFlowCard lineData={lineData} />
+          <MonthlySummaryCard monthlyData={monthlyData} />
         </div>
 
         {/* Middle Column */}
         <div className="md:col-span-1 space-y-6">
-          {/* Kategori Pie Chart */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-gray-500 text-sm font-medium">Kategori</h3>
-              <div className="flex items-center">
-                <button className="text-blue-500 text-xs">Januari</button>
-                <span className="ml-1">▼</span>
-              </div>
-            </div>
-            <div className="h-56">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={0}
-                    dataKey="value"
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="flex justify-center space-x-8 mt-2">
-              <div className="flex items-center">
-                <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
-                <span className="text-xs text-gray-600">Prioritas Utama</span>
-                <span className="text-xs text-gray-800 font-medium ml-1">63%</span>
-              </div>
-              <div className="flex items-center">
-                <div className="w-3 h-3 rounded-full bg-blue-200 mr-2"></div>
-                <span className="text-xs text-gray-600">Pengeluaran</span>
-                <span className="text-xs text-gray-800 font-medium ml-1">25%</span>
-              </div>
-            </div>
-          </div>
+          <CategoryCard pieData={pieData} />
+          <TopCard />
         </div>
 
         {/* Right Column */}
         <div className="md:col-span-1 space-y-6">
-          {/* Calendar */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-2">
-                <button 
-                  onClick={prevMonth}
-                  className="text-gray-500 hover:text-blue-500"
-                >
-                  ◀
-                </button>
-                <div className="text-blue-500 font-medium">{monthNames[activeMonth]}</div>
-                <button 
-                  onClick={nextMonth}
-                  className="text-gray-500 hover:text-blue-500"
-                >
-                  ▶
-                </button>
-              </div>
-              <div className="text-gray-500">
-                <span className="mr-2">{activeYear}</span>
-                <span>▼</span>
-              </div>
-            </div>
-            <div className="grid grid-cols-7 gap-2 text-center mb-2">
-              <div className="text-xs text-gray-500">Mo</div>
-              <div className="text-xs text-gray-500">Tu</div>
-              <div className="text-xs text-gray-500">We</div>
-              <div className="text-xs text-gray-500">Th</div>
-              <div className="text-xs text-gray-500">Fr</div>
-              <div className="text-xs text-gray-500">Sa</div>
-              <div className="text-xs text-gray-500">Su</div>
-            </div>
-            <div className="grid grid-cols-7 gap-2 text-center">
-              {calendarDays.map((day, index) => (
-                <div key={index} className={`
-                  ${day.dayNum === currentDay && activeMonth === currentDate.getMonth() && activeYear === currentDate.getFullYear() 
-                    ? 'bg-blue-500 text-white rounded-full w-8 h-8 mx-auto flex items-center justify-center' : 
-                    day.dayNum === randomHighlightDay 
-                    ? 'bg-blue-500 text-white rounded-full w-8 h-8 mx-auto flex items-center justify-center' : 
-                    day.dayNum ? 'w-8 h-8 mx-auto flex items-center justify-center' : ''}
-                  ${day.dayNum === null ? 'text-gray-300' : 'text-gray-700'}
-                  text-sm
-                `}>
-                  {day.dayNum}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Expense Tracking */}
-          <div className="bg-blue-500 rounded-2xl p-6 text-white shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-white text-sm font-medium">Uang keluar ini</h3>
-              <div className="w-6 h-6 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
-                </svg>
-              </div>
-            </div>
-            <h2 className="text-2xl font-bold mb-4">Rp. 2.100.000,-</h2>
-            <div className="h-12 mb-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={expenseLineData}>
-                  <Line 
-                    type="monotone" 
-                    dataKey="value" 
-                    stroke="#FFFFFF" 
-                    strokeWidth={2}
-                    dot={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="space-y-4">
-              <h4 className="text-white text-sm font-medium">Riwayat</h4>
-              {expenses.map((expense, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="bg-blue-400 w-10 h-10 rounded-lg flex items-center justify-center mr-4">
-                      <span className="text-lg">{expense.icon}</span>
-                    </div>
-                    <div>
-                      <div className="text-sm font-medium">{expense.title}</div>
-                      <div className="text-xs opacity-80">{expense.date}</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-medium">-Rp. {expense.amount},-</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <CalendarCard 
+            activeMonth={activeMonth}
+            activeYear={activeYear}
+            monthNames={monthNames}
+            calendarDays={calendarDays}
+            currentDay={currentDay}
+            currentDate={currentDate}
+            randomHighlightDay={randomHighlightDay}
+            prevMonth={prevMonth}
+            nextMonth={nextMonth}
+          />
+          <ExpenseTrackingCard 
+            expenseLineData={expenseLineData}
+            expenses={expenses}
+          />
         </div>
       </div>
     </div>
