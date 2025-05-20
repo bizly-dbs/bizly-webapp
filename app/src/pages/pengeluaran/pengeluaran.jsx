@@ -1,13 +1,7 @@
-<<<<<<< HEAD
 import { useState, useEffect } from 'react';
 import MonthExpenseCard from './ExpenseCard';
 import AddButton from './AddButton';
 import ExpenseFilter from './ExpenseFilter';
-=======
-import { useState, useEffect } from 'react'
-import MonthExpenseCard from './ExpenseCard'
-import AddButton from './AddButton'
->>>>>>> a2492aef632f6cb1cfbd9e009f946d3d9b805022
 
 const Pengeluaran = () => {
   const [expenseData, setExpenseData] = useState({

@@ -5,11 +5,7 @@ const ExpenseTrackingCard = ({ expenseLineData, expenses }) => {
   return (
     <div className="bg-blue-500 rounded-2xl p-6 text-white shadow-sm">
       <div className="flex items-center justify-between mb-4">
-<<<<<<< HEAD
-        <h3 className="text-white text-sm font-medium">Uang keluar ini</h3>
-=======
         <h3 className="text-white text-sm font-medium">Uang keluar bulan ini</h3>
->>>>>>> a2492aef632f6cb1cfbd9e009f946d3d9b805022
         <div className="w-6 h-6 flex items-center justify-center">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
@@ -53,4 +49,4 @@ const ExpenseTrackingCard = ({ expenseLineData, expenses }) => {
   );
 };
 
-export default ExpenseTrackingCard; 
+export default ExpenseTrackingCard;

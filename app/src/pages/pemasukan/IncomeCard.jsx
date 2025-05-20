@@ -28,14 +28,9 @@ const EditForm = ({ item, onSave, onCancel }) => {
     nominal: item.nominal.replace('Rp. ', '').replace(',-', ''),
     name: item.name,
     category: item.category,
-<<<<<<< HEAD
-    product: item.product || '',
-    quantity: item.quantity || ''
-=======
-    productName: item.productName,
-    quantity: item.quantity,
-    totalAmount: item.totalAmount.replace('Rp. ', '').replace(',-', '')
->>>>>>> a2492aef632f6cb1cfbd9e009f946d3d9b805022
+    productName: item.productName || '',
+    quantity: item.quantity || '',
+    totalAmount: item.totalAmount ? item.totalAmount.replace('Rp. ', '').replace(',-', '') : ''
   })
 
   const handleSubmit = (e) => {
@@ -46,14 +41,9 @@ const EditForm = ({ item, onSave, onCancel }) => {
       nominal: `Rp. ${editData.nominal},-`,
       name: editData.name,
       category: editData.category,
-<<<<<<< HEAD
-      product: editData.product,
-      quantity: editData.quantity
-=======
       productName: editData.productName,
       quantity: editData.quantity,
       totalAmount: `Rp. ${editData.totalAmount},-`
->>>>>>> a2492aef632f6cb1cfbd9e009f946d3d9b805022
     })
   }
 
@@ -61,11 +51,7 @@ const EditForm = ({ item, onSave, onCancel }) => {
     <tr className="border-b border-gray-200 bg-blue-50">
       <td colSpan="7" className="px-4 py-4">
         <form onSubmit={handleSubmit} className="space-y-4">
-<<<<<<< HEAD
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-=======
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
->>>>>>> a2492aef632f6cb1cfbd9e009f946d3d9b805022
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
               <input
@@ -103,36 +89,22 @@ const EditForm = ({ item, onSave, onCancel }) => {
               />
             </div>
             <div>
-<<<<<<< HEAD
-              <label className="block text-sm font-medium text-gray-700 mb-1">Produk</label>
-              <input
-                type="text"
-                value={editData.product}
-                onChange={(e) => setEditData({ ...editData, product: e.target.value })}
-=======
               <label className="block text-sm font-medium text-gray-700 mb-1">Nama Produk</label>
               <input
                 type="text"
                 value={editData.productName}
                 onChange={(e) => setEditData({ ...editData, productName: e.target.value })}
->>>>>>> a2492aef632f6cb1cfbd9e009f946d3d9b805022
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
               />
             </div>
             <div>
-<<<<<<< HEAD
-              <label className="block text-sm font-medium text-gray-700 mb-1">Jumlah</label>
-=======
               <label className="block text-sm font-medium text-gray-700 mb-1">Jumlah Terjual</label>
->>>>>>> a2492aef632f6cb1cfbd9e009f946d3d9b805022
               <input
                 type="number"
                 value={editData.quantity}
                 onChange={(e) => setEditData({ ...editData, quantity: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
-<<<<<<< HEAD
                 min="1"
-=======
               />
             </div>
             <div>
@@ -142,7 +114,6 @@ const EditForm = ({ item, onSave, onCancel }) => {
                 value={editData.totalAmount}
                 onChange={(e) => setEditData({ ...editData, totalAmount: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
->>>>>>> a2492aef632f6cb1cfbd9e009f946d3d9b805022
               />
             </div>
           </div>
@@ -232,14 +203,9 @@ const IncomeRow = ({ item, onSave, onDelete }) => {
       <td className="px-4 py-4 text-sm font-medium text-gray-900">{item.nominal}</td>
       <td className="px-4 py-4 text-sm text-gray-700">{item.name}</td>
       <td className="px-4 py-4 text-sm text-gray-700">{item.category}</td>
-<<<<<<< HEAD
-      <td className="px-4 py-4 text-sm text-gray-700">{item.product || '-'}</td>
+      <td className="px-4 py-4 text-sm text-gray-700">{item.productName || '-'}</td>
       <td className="px-4 py-4 text-sm text-gray-700">{item.quantity || '-'}</td>
-=======
-      <td className="px-4 py-4 text-sm text-gray-700">{item.productName}</td>
-      <td className="px-4 py-4 text-sm text-gray-700">{item.quantity}</td>
-      <td className="px-4 py-4 text-sm text-gray-700">{item.totalAmount}</td>
->>>>>>> a2492aef632f6cb1cfbd9e009f946d3d9b805022
+      <td className="px-4 py-4 text-sm text-gray-700">{item.totalAmount || '-'}</td>
       <td className="px-4 py-4 text-right relative">
         <button 
           onClick={() => setShowDropdown(!showDropdown)}
@@ -269,14 +235,9 @@ const MonthIncomeCard = ({ month, incomeList, onUpdateIncome, onDeleteIncome }) 
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Nominal</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Nama Transaksi</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Kategori</th>
-<<<<<<< HEAD
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Produk</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Jumlah</th>
-=======
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Nama Produk</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Jumlah</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Total</th>
->>>>>>> a2492aef632f6cb1cfbd9e009f946d3d9b805022
               <th className="px-4 py-3 text-right text-sm font-medium text-gray-500"></th>
             </tr>
           </thead>
