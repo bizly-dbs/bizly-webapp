@@ -1,18 +1,31 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Filter } from 'lucide-react';
 
 const IncomeFilter = ({ onApplyFilter, onResetFilter, categories, products }) => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [category, setCategory] = useState('');
+  const [selectedCategories, setSelectedCategories] = useState([]);
   const [product, setProduct] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const categoryDropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(event.target)) {
+        setIsCategoryDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleApplyFilter = () => {
     onApplyFilter({
       startDate,
       endDate,
-      category,
+      category: selectedCategories,
       product,
       type: 'Semua'
     });
@@ -25,13 +38,23 @@ const IncomeFilter = ({ onApplyFilter, onResetFilter, categories, products }) =>
   const handleResetFilter = () => {
     setStartDate('');
     setEndDate('');
-    setCategory('');
+    setSelectedCategories([]);
     setProduct('');
     onResetFilter();
     
     if (window.innerWidth < 768) {
       setIsFilterOpen(false);
     }
+  };
+
+  const handleCategoryChange = (category) => {
+    setSelectedCategories(prev => {
+      if (prev.includes(category)) {
+        return prev.filter(cat => cat !== category);
+      } else {
+        return [...prev, category];
+      }
+    });
   };
 
   return (
@@ -72,18 +95,54 @@ const IncomeFilter = ({ onApplyFilter, onResetFilter, categories, products }) =>
             />
           </div>
           
-          <div>
+          <div className="relative" ref={categoryDropdownRef}>
             <label className="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
-            <select
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
+            <button
+              type="button"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-left focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
+              onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
             >
-              <option value="">Semua Kategori</option>
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
+              {selectedCategories.length > 0 
+                ? `${selectedCategories.length} kategori dipilih`
+                : 'Pilih Kategori'}
+            </button>
+            
+            {isCategoryDropdownOpen && (
+              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                {categories.map((cat) => (
+                  <div 
+                    key={cat} 
+                    className="flex items-center px-4 py-3 hover:bg-blue-50 transition-colors duration-150 border-b border-gray-100 last:border-b-0"
+                  >
+                    <div className="relative">
+                      <input
+                        type="checkbox"
+                        id={`category-${cat}`}
+                        checked={selectedCategories.includes(cat)}
+                        onChange={() => handleCategoryChange(cat)}
+                        className="h-5 w-5 text-blue-500 border-gray-300 rounded cursor-pointer focus:ring-0"
+                      />
+                    </div>
+                    <label 
+                      htmlFor={`category-${cat}`} 
+                      className="ml-3 text-sm text-gray-700 cursor-pointer select-none flex-grow font-medium"
+                    >
+                      {cat}
+                    </label>
+                    {selectedCategories.includes(cat) && (
+                      <span className="text-blue-500 text-xs font-semibold bg-blue-50 px-2 py-1 rounded-full">
+                        Selected
+                      </span>
+                    )}
+                  </div>
+                ))}
+                {categories.length === 0 && (
+                  <div className="px-4 py-3 text-sm text-gray-500 text-center bg-gray-50">
+                    No categories available
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           
           <div>

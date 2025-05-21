@@ -110,6 +110,7 @@ const Pemasukan = () => {
   }
   
   const handleApplyFilter = (filters) => {
+    console.log('Applying filters:', filters);
     const startDate = filters.startDate ? new Date(filters.startDate) : null
     const endDate = filters.endDate ? new Date(filters.endDate) : null
     
@@ -124,10 +125,19 @@ const Pemasukan = () => {
           parseInt(dateParts[0].trim())
         )
         
+        // Date filtering
         if (startDate && itemDate < startDate) return false
         if (endDate && itemDate > endDate) return false
-        if (filters.category && item.category !== filters.category) return false
+        
+        // Category filtering - if no categories selected, show all
+        if (filters.category && filters.category.length > 0) {
+          if (!filters.category.includes(item.category)) return false
+        }
+        
+        // Product filtering
         if (filters.product && item.product !== filters.product) return false
+        
+        // Type filtering
         if (filters.type !== 'Semua' && item.type !== filters.type) return false
         
         return true
@@ -138,6 +148,7 @@ const Pemasukan = () => {
       }
     })
     
+    console.log('Filtered data:', filtered);
     setFilteredData(filtered)
   }
   
