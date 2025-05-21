@@ -29,8 +29,7 @@ const EditForm = ({ item, onSave, onCancel }) => {
     name: item.name,
     category: item.category,
     productName: item.productName || '',
-    quantity: item.quantity || '',
-    totalAmount: item.totalAmount ? item.totalAmount.replace('Rp. ', '').replace(',-', '') : ''
+    quantity: item.quantity || ''
   })
 
   const handleSubmit = (e) => {
@@ -42,14 +41,13 @@ const EditForm = ({ item, onSave, onCancel }) => {
       name: editData.name,
       category: editData.category,
       productName: editData.productName,
-      quantity: editData.quantity,
-      totalAmount: `Rp. ${editData.totalAmount},-`
+      quantity: editData.quantity
     })
   }
 
   return (
     <tr className="border-b border-gray-200 bg-blue-50">
-      <td colSpan="7" className="px-4 py-4">
+      <td colSpan="6" className="px-4 py-4">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div>
@@ -107,15 +105,6 @@ const EditForm = ({ item, onSave, onCancel }) => {
                 min="1"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Total Penjualan</label>
-              <input
-                type="text"
-                value={editData.totalAmount}
-                onChange={(e) => setEditData({ ...editData, totalAmount: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              />
-            </div>
           </div>
           <div className="flex justify-end gap-2">
             <button
@@ -141,7 +130,7 @@ const EditForm = ({ item, onSave, onCancel }) => {
 const DeleteConfirmation = ({ onConfirm, onCancel }) => {
   return (
     <tr className="border-b border-gray-200 bg-red-50">
-      <td colSpan="7" className="px-4 py-4">
+      <td colSpan="6" className="px-4 py-4">
         <div className="text-center">
           <p className="text-gray-800 mb-4">Apakah Anda yakin ingin menghapus data ini?</p>
           <div className="flex justify-center gap-2">
@@ -205,7 +194,6 @@ const IncomeRow = ({ item, onSave, onDelete }) => {
       <td className="px-4 py-4 text-sm text-gray-700">{item.category}</td>
       <td className="px-4 py-4 text-sm text-gray-700">{item.productName || '-'}</td>
       <td className="px-4 py-4 text-sm text-gray-700">{item.quantity || '-'}</td>
-      <td className="px-4 py-4 text-sm text-gray-700">{item.totalAmount || '-'}</td>
       <td className="px-4 py-4 text-right relative">
         <button 
           onClick={() => setShowDropdown(!showDropdown)}
@@ -237,7 +225,6 @@ const MonthIncomeCard = ({ month, incomeList, onUpdateIncome, onDeleteIncome }) 
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Kategori</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Nama Produk</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Jumlah</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Total</th>
               <th className="px-4 py-3 text-right text-sm font-medium text-gray-500"></th>
             </tr>
           </thead>

@@ -20,8 +20,7 @@ const TambahMasuk = () => {
     transactionName: '',
     category: '',
     productName: '',
-    quantity: '',
-    totalAmount: ''
+    quantity: ''
   })
   
   const [categories, setCategories] = useState([
@@ -104,8 +103,7 @@ const TambahMasuk = () => {
       category: selectedCategory,
       type: 'Pembayaran',
       productName: formData.productName,
-      quantity: formData.quantity,
-      totalAmount: formData.totalAmount
+      quantity: formData.quantity
     }
     
     console.log('New income entry:', newEntry)
@@ -230,19 +228,6 @@ const TambahMasuk = () => {
               onChange={handleChange}
               placeholder="Masukkan jumlah produk terjual"
               min="1"
-              className={styles.inputField}
-              required
-            />
-          </div>
-
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Total Penjualan</label>
-            <input
-              type="text"
-              name="totalAmount"
-              value={formData.totalAmount}
-              onChange={handleChange}
-              placeholder="Masukkan total penjualan"
               className={styles.inputField}
               required
             />
