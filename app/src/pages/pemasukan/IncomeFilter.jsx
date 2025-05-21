@@ -109,7 +109,7 @@ const IncomeFilter = ({ onApplyFilter, onResetFilter, categories, products }) =>
             
             {isCategoryDropdownOpen && (
               <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                {categories.map((cat) => (
+              {categories.map((cat) => (
                   <div 
                     key={cat} 
                     className="flex items-center px-4 py-3 hover:bg-blue-50 transition-colors duration-150 border-b border-gray-100 last:border-b-0"

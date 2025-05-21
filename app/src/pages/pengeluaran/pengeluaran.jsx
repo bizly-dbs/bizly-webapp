@@ -60,8 +60,7 @@ const Pengeluaran = () => {
     ]
   });
   
-  const [filteredData, setFilteredData] = useState({});
-  const [activeFilter, setActiveFilter] = useState(null);
+  const [filteredData, setFilteredData] = useState(null);
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
@@ -75,12 +74,7 @@ const Pengeluaran = () => {
     });
     
     setCategories([...allCategories]);
-    
-    // Initialize filtered data with original data
-    if (!activeFilter) {
-      setFilteredData(expenseData);
-    }
-  }, [expenseData, activeFilter]);
+  }, [expenseData]);
 
   // Store expense data in localStorage when it changes
   useEffect(() => {
@@ -113,54 +107,65 @@ const Pengeluaran = () => {
     }));
   };
   
-  const handleApplyFilter = (filterParams) => {
-    setActiveFilter(filterParams);
+  const handleApplyFilter = (filters) => {
+    console.log('Applying filters:', filters);
+    const startDate = filters.startDate ? new Date(filters.startDate) : null;
+    const endDate = filters.endDate ? new Date(filters.endDate) : null;
     
     const filtered = {};
     
-    Object.entries(expenseData).forEach(([month, expenses]) => {
-      const filteredExpenses = expenses.filter(expense => {
-        // Filter by date range
-        let passesDateFilter = true;
-        if (filterParams.startDate || filterParams.endDate) {
-          const expenseDate = convertDateFormat(expense.date);
-          
-          if (filterParams.startDate && new Date(expenseDate) < new Date(filterParams.startDate)) {
-            passesDateFilter = false;
-          }
-          
-          if (filterParams.endDate && new Date(expenseDate) > new Date(filterParams.endDate)) {
-            passesDateFilter = false;
-          }
+    Object.entries(expenseData).forEach(([month, monthData]) => {
+      const filteredMonthData = monthData.filter(item => {
+        const dateParts = item.date.split('/');
+        const itemDate = new Date(
+          parseInt(dateParts[2].trim()), 
+          parseInt(dateParts[1].trim()) - 1, 
+          parseInt(dateParts[0].trim())
+        );
+        
+        // Date filtering - include start date
+        if (startDate) {
+          const startOfDay = new Date(startDate);
+          startOfDay.setHours(0, 0, 0, 0);
+          const itemStartOfDay = new Date(itemDate);
+          itemStartOfDay.setHours(0, 0, 0, 0);
+          if (itemStartOfDay < startOfDay) return false;
         }
         
-        // Filter by category
-        let passesCategoryFilter = true;
-        if (filterParams.category && expense.category !== filterParams.category) {
-          passesCategoryFilter = false;
+        // End date filtering - include end date
+        if (endDate) {
+          const endOfDay = new Date(endDate);
+          endOfDay.setHours(23, 59, 59, 999);
+          const itemEndOfDay = new Date(itemDate);
+          itemEndOfDay.setHours(23, 59, 59, 999);
+          if (itemEndOfDay > endOfDay) return false;
         }
         
-        return passesDateFilter && passesCategoryFilter;
+        // Category filtering - if no categories selected, show all
+        if (filters.category && filters.category.length > 0) {
+          if (!filters.category.includes(item.category)) return false;
+        }
+        
+        // Type filtering
+        if (filters.type !== 'Semua' && item.type !== filters.type) return false;
+        
+        return true;
       });
       
-      if (filteredExpenses.length > 0) {
-        filtered[month] = filteredExpenses;
+      if (filteredMonthData.length > 0) {
+        filtered[month] = filteredMonthData;
       }
     });
     
+    console.log('Filtered data:', filtered);
     setFilteredData(filtered);
   };
   
   const handleResetFilter = () => {
-    setActiveFilter(null);
-    setFilteredData(expenseData);
+    setFilteredData(null);
   };
   
-  // Helper function to convert date format from DD/MM/YYYY to YYYY-MM-DD for comparison
-  const convertDateFormat = (dateString) => {
-    const [day, month, year] = dateString.split('/');
-    return `${year}-${month}-${day}`;
-  };
+  const displayData = filteredData || expenseData;
   
   return (
     <div className="min-h-screen bg-gray-50 p-6 font-['Poppins']">
@@ -169,20 +174,20 @@ const Pengeluaran = () => {
       <div className="flex flex-col md:flex-row md:gap-6">
         {/* Expense List - takes remaining space */}
         <div className="flex-grow order-2 md:order-1">
-          {Object.keys(filteredData).length === 0 ? (
+          {Object.entries(displayData).map(([month, data]) => (
+            <MonthExpenseCard 
+              key={month} 
+              month={month.charAt(0).toUpperCase() + month.slice(1)} 
+              expenseList={data}
+              onUpdateExpense={handleUpdateExpense}
+              onDeleteExpense={handleDeleteExpense}
+            />
+          ))}
+          
+          {Object.keys(displayData).length === 0 && (
             <div className="bg-white p-8 rounded-md shadow-sm text-center">
               <p className="text-gray-500">Tidak ada data yang sesuai dengan filter</p>
             </div>
-          ) : (
-            Object.entries(filteredData).map(([month, data]) => (
-              <MonthExpenseCard 
-                key={month} 
-                month={month.charAt(0).toUpperCase() + month.slice(1)} 
-                expenseList={data}
-                onUpdateExpense={handleUpdateExpense}
-                onDeleteExpense={handleDeleteExpense}
-              />
-            ))
           )}
         </div>
         
