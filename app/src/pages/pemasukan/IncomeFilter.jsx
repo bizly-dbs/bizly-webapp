@@ -46,7 +46,7 @@ const IncomeFilter = ({ onApplyFilter, onResetFilter, categories, products }) =>
         </button>
       </div>
 
-      <div className={`${!isFilterOpen && 'hidden md:block'} bg-white p-4 rounded-md shadow-sm border border-gray-100`}>
+      <div className={`${!isFilterOpen && 'hidden md:block'} bg-white p-4 rounded-lg shadow-sm font-['Poppins'] border border-gray-100`}>
         <h2 className="text-lg font-semibold mb-4">Filter</h2>
         
         <div className="space-y-4">
