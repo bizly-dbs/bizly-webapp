@@ -85,7 +85,7 @@ const ExpenseFilter = ({ onApplyFilter, onResetFilter, categories }) => {
           
           <div className="flex flex-col gap-2 pt-2">
             <button
-              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-2.5 px-4 rounded-md transition duration-200 font-medium text-sm"
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2.5 px-4 rounded-md transition duration-200 font-medium text-sm"
               onClick={handleApplyFilter}
             >
               Terapkan Filter
