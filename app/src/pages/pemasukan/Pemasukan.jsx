@@ -125,9 +125,23 @@ const Pemasukan = () => {
           parseInt(dateParts[0].trim())
         )
         
-        // Date filtering
-        if (startDate && itemDate < startDate) return false
-        if (endDate && itemDate > endDate) return false
+        // Date filtering - include start date
+        if (startDate) {
+          const startOfDay = new Date(startDate);
+          startOfDay.setHours(0, 0, 0, 0);
+          const itemStartOfDay = new Date(itemDate);
+          itemStartOfDay.setHours(0, 0, 0, 0);
+          if (itemStartOfDay < startOfDay) return false;
+        }
+        
+        // End date filtering - include end date
+        if (endDate) {
+          const endOfDay = new Date(endDate);
+          endOfDay.setHours(23, 59, 59, 999);
+          const itemEndOfDay = new Date(itemDate);
+          itemEndOfDay.setHours(23, 59, 59, 999);
+          if (itemEndOfDay > endOfDay) return false;
+        }
         
         // Category filtering - if no categories selected, show all
         if (filters.category && filters.category.length > 0) {
