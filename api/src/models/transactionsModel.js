@@ -2,6 +2,7 @@ import { Sequelize } from "sequelize";
 import db from "../config/database.js";
 import Users from "./userModel.js";
 import Categories from "./categoriesModel.js";
+import TransactionsProducts from "./transactionsProductModel.js";
 
 const { DataTypes } = Sequelize;
 
@@ -69,5 +70,21 @@ Transactions.belongsTo(Categories, {
   onDelete: "CASCADE",
   onUpdate: "CASCADE",
 });
+
+Transactions.hasMany(TransactionsProducts, {
+  foreignKey: "transaction_id",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+
+if (typeof TransactionsProducts.associations.transaction === 'undefined') {
+  TransactionsProducts.belongsTo(Transactions, {
+    foreignKey: "transaction_id",
+    targetKey: "id",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+  });
+}
 
 export default Transactions

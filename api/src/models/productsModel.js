@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize";
 import db from "../config/database.js";
+import Users from "./userModel.js";
 
 const { DataTypes } = Sequelize;
 
@@ -35,7 +36,14 @@ const Products = db.define("products", {
             notEmpty: true,
             isDecimal: true,
         },
-    }
+    },
+});
+
+Products.belongsTo(Users, {
+    foreignKey: "user_id",
+    targetKey: "id",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
 });
 
 export default Products;

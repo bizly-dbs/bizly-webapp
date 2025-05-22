@@ -28,7 +28,7 @@ const Users = db.define(
       allowNull: false,
       validate: {
         notEmpty: true,
-        len: [8, 50],
+        len: [8, 100],
       },
     },
     email: {
@@ -43,6 +43,7 @@ const Users = db.define(
   },
   {
     freezeTableName: true,
+    timestamps: false
   }
 );
 

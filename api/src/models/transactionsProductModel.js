@@ -1,11 +1,10 @@
 import { Sequelize } from "sequelize";
 import db from "../config/database.js";
-import Transactions from "./transactionsModel.js";
 import Products from "./productsModel.js";
 
 const { DataTypes } = Sequelize;
 
-const TransactionsProducts = db.define("transactions_products", {
+const TransactionsProducts = db.define("transaction_products", {
     id: {
         type: DataTypes.BIGINT,
         autoIncrement: true,
@@ -54,13 +53,6 @@ const TransactionsProducts = db.define("transactions_products", {
             isDecimal: true,
         },
     },
-});
-
-TransactionsProducts.belongsTo(Transactions, {
-    foreignKey: "transaction_id",
-    targetKey: "id",
-    onDelete: "CASCADE",
-    onUpdate: "CASCADE",
 });
 
 TransactionsProducts.belongsTo(Products, {

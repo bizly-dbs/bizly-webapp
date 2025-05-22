@@ -13,10 +13,13 @@ export const getCategories = async (req, res) => {
         }
         const categories = await Categories.findAll({ 
             where,
-            attributes: ["name", "description" ],
+            attributes: ["id","name", "description" ],
             include: [
                 {
                     model: Users,
+                    attributes: [
+                        "id", "username"
+                    ]
                 }
             ],
             raw: true,

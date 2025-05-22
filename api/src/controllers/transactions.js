@@ -4,6 +4,7 @@ import Categories from "../models/categoriesModel.js";
 import { Op } from "sequelize";
 import TransactionsProducts from "../models/transactionsProductModel.js";
 import Products from "../models/productsModel.js";
+import sequelize from "sequelize";
 
 export const getTransactions = async (req, res) => {
   try {
@@ -18,6 +19,9 @@ export const getTransactions = async (req, res) => {
     const transactions = await Transactions.findAll({
       where,
       attributes: [
+        "id",
+        "user_id",
+        "category_id",
         "transaction_name",
         "amount",
         "description",
@@ -27,7 +31,7 @@ export const getTransactions = async (req, res) => {
       include: [
         {
           model: Users,
-          attributes: ["name"],
+          attributes: ["username"],
         },
         {
           model: Categories,
@@ -59,6 +63,7 @@ export const createTransaction = async (req, res) => {
     description,
     type,
     transaction_date,
+    category_id,
     products,
   } = req.body;
 
@@ -69,10 +74,11 @@ export const createTransaction = async (req, res) => {
       description,
       type,
       transaction_date,
+      category_id,
       user_id: req.userId,
     });
 
-    if (products && products.length > 0) {
+    if (type === "Pemasukan" && products && products.length > 0) {
       const transactionProducts = products.map((product) => ({
         transaction_id: transaction.id,
         product_id: product.product_id,
@@ -143,7 +149,7 @@ export const getTransactionById = async (req, res) => {
       include: [
         {
           model: Users,
-          attributes: ["name"],
+          attributes: ["username"],
         },
         {
           model: Categories,
@@ -209,7 +215,7 @@ export const filterTransactions = async (req, res) => {
 
 export const searchTransactions = async (req, res) => {
   const { keyword } = req.query;
-  const where = { user_id: userId };
+  const where = { user_id: req.userId };
   if (keyword) {
     where.transaction_name = {
       [Op.like]: `%${keyword}%`,
@@ -244,58 +250,49 @@ export const transactionSummary = async (req, res) => {
     let groupBy;
     if (period === "weekly") {
       groupBy = [
-        sequelize.fn("YEAR"),
-        sequelize.fn("WEEK", sequelize.col("transaction_date")),
+        sequelize.fn("date_part","YEAR", sequelize.col("transaction_date")),
+        sequelize.fn("date_part","WEEK", sequelize.col("transaction_date")),
       ];
     } else if (period === "monthly") {
       groupBy = [
-        sequelize.fn("YEAR"),
-        sequelize.fn("MONTH", sequelize.col("transaction_date")),
+        sequelize.fn("date_part","YEAR", sequelize.col("transaction_date")),
+        sequelize.fn("date_part","MONTH", sequelize.col("transaction_date")),
       ];
     } else {
       return res.status(400).json({ message: "Invalid period" });
     }
-
+  ;
     const summary = await Transactions.findAll({
       where,
       attributes: [
-        [
-          Sequelize.fn(
-            "SUM",
-            Sequelize.literal(
-              `CASE WHEN type = 'Pemasukan' THEN amount ELSE 0 END`
-            )
+         [
+           sequelize.fn(
+             "SUM",
+             sequelize.literal(
+               `CASE WHEN type = 'Pemasukan' THEN amount ELSE 0 END`
+             )
+           ),
+           "total_income",
+         ],
+         [
+           sequelize.fn(
+             "SUM",
+             sequelize.literal(
+               `CASE WHEN type = 'Pengeluaran' THEN amount ELSE 0 END`
+             )
+           ),
+           "total_expense",
+         ],
+          [
+          sequelize.literal(
+            `SUM(CASE WHEN type = 'Pemasukan' THEN amount ELSE 0 END) - SUM(CASE WHEN type = 'Pengeluaran' THEN amount ELSE 0 END)`
           ),
-          "total_income",
-        ],
-        [
-          Sequelize.fn(
-            "SUM",
-            Sequelize.literal(
-              `CASE WHEN type = 'Pengeluaran' THEN amount ELSE 0 END`
-            )
-          ),
-          "total_expense",
-        ],
-        [
-          Sequelize.fn(
-            "SUM",
-            Sequelize.literal(
-              `CASE WHEN type = 'Pemasukan' THEN amount ELSE 0 END`
-            )
-          ) -
-            Sequelize.fn(
-              "SUM",
-              Sequelize.literal(
-                `CASE WHEN type = 'Pengeluaran' THEN amount ELSE 0 END`
-              )
-            ),
-          "net_profit_loss",
-        ],
-        [Sequelize.fn("YEAR", Sequelize.col("transaction_date")), "year"],
-        period === "weekly"
-          ? [Sequelize.fn("WEEK", Sequelize.col("transaction_date")), "week"]
-          : [Sequelize.fn("MONTH", Sequelize.col("transaction_date")), "month"],
+            "net_profit_loss"
+          ],
+         [sequelize.fn("date_part","YEAR", sequelize.col("transaction_date")), "year"],
+         period === "weekly"
+           ? [sequelize.fn("date_part","WEEK", sequelize.col("transaction_date")), "week"]
+           : [sequelize.fn("date_part","MONTH", sequelize.col("transaction_date")), "month"],
       ],
       group: groupBy,
       raw: true,
@@ -345,11 +342,11 @@ export const transactionsByDate = async (req, res) => {
 
     const income = transactions
       .filter((t) => t.type === "Pemasukan")
-      .reduce((sum, t) => sum + t.amount, 0);
+      .reduce((sum, t) => sum + Number(t.amount), 0);
 
     const expense = transactions
       .filter((t) => t.type === "Pengeluaran")
-      .reduce((sum, t) => sum + t.amount, 0);
+      .reduce((sum, t) => sum + Number(t.amount), 0);
 
     res.status(200).json({
       date,
