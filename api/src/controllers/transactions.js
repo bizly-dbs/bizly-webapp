@@ -305,3 +305,59 @@ export const transactionSummary = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const transactionsByDate = async (req, res) => {
+  const { date } = req.params;
+  const where = {
+    user_id: req.userId,
+    transaction_date: {
+      [Op.eq]: new Date(date),
+    },
+  };
+
+  try {
+    const transactions = await Transactions.findAll({
+      where,
+      attributes: [
+        "transaction_name",
+        "amount",
+        "description",
+        "type",
+        "transaction_date",
+      ],
+      include: [
+        {
+          model: Categories,
+          attributes: ["name"],
+        },
+        {
+          model: TransactionsProducts,
+          attributes: ["quantity", "price", "total_price"],
+          include: [
+            {
+              model: Products,
+              attributes: ["name"],
+            },
+          ],
+        },
+      ],
+    });
+
+    const income = transactions
+      .filter((t) => t.type === "Pemasukan")
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    const expense = transactions
+      .filter((t) => t.type === "Pengeluaran")
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    res.status(200).json({
+      date,
+      income,
+      expense,
+      transactions,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

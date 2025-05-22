@@ -1,5 +1,5 @@
 import express from 'express';
-import { getTransactions, createTransaction, updateTransaction, deleteTransaction, filterTransactions, searchTransactions, transactionSummary } from '../controllers/transactions.js';
+import { getTransactions, createTransaction, updateTransaction, deleteTransaction, filterTransactions, searchTransactions, transactionSummary, transactionsByDate } from '../controllers/transactions.js';
 import { validateDateRange } from '../middlewares/validateDate.js';
 import { validateSearchInput } from '../middlewares/validateKeyword.js';
 
@@ -12,5 +12,6 @@ router.delete('/transactions/:id', deleteTransaction);
 router.get('/transactions/filter', validateDateRange, filterTransactions)
 router.get('/transactions/search', validateSearchInput, searchTransactions)
 router.get('/transactions/summary', transactionSummary)
+router.get('/transactions/calendar/:date', transactionsByDate)
 
 export default router;
