@@ -69,3 +69,5 @@ Transactions.belongsTo(Categories, {
   onDelete: "CASCADE",
   onUpdate: "CASCADE",
 });
+
+export default Transactions

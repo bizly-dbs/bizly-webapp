@@ -1,6 +1,5 @@
 import express from 'express';
 import { getCategories, createCategory, updateCategory, deleteCategory } from '../controllers/categories.js';
-import e from 'express';
 
 const router = express.Router();
 

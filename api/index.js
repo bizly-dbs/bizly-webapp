@@ -1,10 +1,12 @@
-require('dotenv').config();
-const express = require('express');
-const authRoute = require('./routes/authRoute');
-const categoriesRoute = require('./routes/categoriesRoute');
-const transactionRoute = require('./routes/transactionRoute');
-const userRoute = require('./routes/userRoute');
-const transactionProductRoute = require('./routes/transactionProductRoute');
+import dotenv from 'dotenv';
+dotenv.config();
+
+import express from 'express';
+import authRoute from './src/routes/authRoute.js';
+import categoriesRoute from './src/routes/categoriesRoute.js';
+import transactionRoute from './src/routes/transactionRoute.js';
+import userRoute from './src/routes/userRoute.js';
+import transactionProductRoute from './src/routes/transactionProductRoute.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;

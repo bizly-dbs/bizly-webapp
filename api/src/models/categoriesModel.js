@@ -6,7 +6,7 @@ const { DataTypes } = Sequelize;
 
 const Categories = db.define("categories", {
   id: {
-    type: DataTypes.BigInt,
+    type: DataTypes.BIGINT,
     autoIncrement: true,
     primaryKey: true,
     allowNull: false,

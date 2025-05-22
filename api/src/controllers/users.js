@@ -1,4 +1,4 @@
-import Users from "../models/userModel";
+import Users from "../models/userModel.js";
 import argon2 from "argon2";
 import Sequelize from "sequelize";
 

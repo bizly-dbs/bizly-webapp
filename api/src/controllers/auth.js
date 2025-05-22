@@ -1,6 +1,6 @@
-import Users from "../models/userModel";
+import Users from "../models/userModel.js";
 import argon2 from "argon2";
-import { sendOTP, verifyOTP as validateOTP } from '../services/otpService.js';
+import { sendOTP, verifyOTP as validateOTP } from '../service/otpService.js';
 
 export const login = async (req, res) => {
   const user = await Users.findOne({

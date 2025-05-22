@@ -1,4 +1,4 @@
-import Users from "../models/userModel";
+import Users from "../models/userModel.js";
 import Transactions from "../models/transactionsModel.js";
 import Categories from "../models/categoriesModel.js";
 import { Op } from "sequelize";

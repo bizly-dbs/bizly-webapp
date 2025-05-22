@@ -1,5 +1,5 @@
-import Categories from "../models/categoryModel";
-import Users from "../models/userModel";
+import Categories from "../models/categoriesModel.js";
+import Users from "../models/userModel.js";
 
 export const getCategories = async (req, res) => {
     try{

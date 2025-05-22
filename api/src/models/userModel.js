@@ -7,7 +7,7 @@ const Users = db.define(
   "users",
   {
     id: {
-      type: DataTypes.BigInt,
+      type: DataTypes.BIGINT,
       autoIncrement: true,
       primaryKey: true,
       allowNull: false,
@@ -26,7 +26,7 @@ const Users = db.define(
     password: {
       type: DataTypes.STRING,
       allowNull: false,
-      valdadate: {
+      validate: {
         notEmpty: true,
         len: [8, 50],
       },

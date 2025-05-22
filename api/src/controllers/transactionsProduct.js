@@ -1,6 +1,6 @@
-import TransactionsProducts from "../models/transactionsProductModel";
-import Products from "../models/productsModel";
-import { Sequelize } from "../config/database";
+import TransactionsProducts from "../models/transactionsProductModel.js";
+import Products from "../models/productsModel.js";
+import { Sequelize } from "sequelize";
 
 export const topSellingProducts = async (req, res) => {
     try{
