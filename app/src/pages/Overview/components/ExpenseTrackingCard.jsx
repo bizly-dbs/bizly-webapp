@@ -49,4 +49,4 @@ const ExpenseTrackingCard = ({ expenseLineData, expenses }) => {
   );
 };
 
-export default ExpenseTrackingCard; 
+export default ExpenseTrackingCard;
