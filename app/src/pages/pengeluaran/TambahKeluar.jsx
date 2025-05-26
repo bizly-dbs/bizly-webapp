@@ -1,8 +1,7 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Calendar, Upload, Camera } from 'lucide-react'
+import { Calendar } from 'lucide-react'
 import DatePicker from 'react-datepicker'
-import Webcam from 'react-webcam'
 import "react-datepicker/dist/react-datepicker.css"
 
 const styles = {
@@ -21,40 +20,12 @@ const TambahKeluar = () => {
     category: '',
   })
   
-  const [selectedFile, setSelectedFile] = useState(null)
-  const [showCamera, setShowCamera] = useState(false)
-  const webcamRef = useRef(null)
-  
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData({
       ...formData,
       [name]: value
     })
-  }
-  
-  const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0])
-    }
-  }
-
-  const handleCameraCapture = () => {
-    setShowCamera(true)
-  }
-
-  const captureImage = () => {
-    const imageSrc = webcamRef.current.getScreenshot()
-    if (imageSrc) {
-      // Convert base64 to blob
-      fetch(imageSrc)
-        .then(res => res.blob())
-        .then(blob => {
-          const file = new File([blob], "camera-capture.jpg", { type: "image/jpeg" })
-          setSelectedFile(file)
-          setShowCamera(false)
-        })
-    }
   }
   
   const handleSubmit = (e) => {
@@ -70,8 +41,7 @@ const TambahKeluar = () => {
       nominal: `Rp. ${formData.nominal},-`,
       name: formData.transactionName,
       category: formData.category,
-      type: 'Pengeluaran',
-      file: selectedFile ? selectedFile.name : null
+      type: 'Pengeluaran'
     }
     
     console.log('New expense entry:', newEntry)
@@ -128,7 +98,7 @@ const TambahKeluar = () => {
             />
           </div>
           
-          <div className="mb-6">
+          <div className="mb-8">
             <label className="block text-sm font-medium text-blue-600 mb-2">Kategori</label>
             <div className="relative">
               <select
@@ -148,81 +118,6 @@ const TambahKeluar = () => {
                 <svg className="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
-              </div>
-            </div>
-          </div>
-          
-          <div className="mb-8">
-            <label className="block text-sm font-medium text-blue-600 mb-2">Upload Struk</label>
-            <div className="border border-gray-300 rounded-lg p-2">
-              <div className="flex mb-2">
-                <button
-                  type="button"
-                  onClick={() => document.getElementById('fileInput').click()}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-md text-sm flex items-center gap-2"
-                >
-                  <Upload size={16} />
-                  Upload File
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCameraCapture}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md text-sm ml-2 flex items-center gap-2"
-                >
-                  <Camera size={16} />
-                  Ambil Gambar
-                </button>
-                <input 
-                  id="fileInput"
-                  type="file"
-                  onChange={handleFileChange}
-                  className="hidden"
-                  accept=".png,.jpg,.jpeg"
-                />
-              </div>
-              
-              <div className="h-64 border border-gray-200 rounded-lg">
-                {showCamera ? (
-                  <div className="relative h-full">
-                    <Webcam
-                      audio={false}
-                      ref={webcamRef}
-                      screenshotFormat="image/jpeg"
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                    <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-                      <button
-                        type="button"
-                        onClick={captureImage}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-full"
-                      >
-                        Ambil Foto
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setShowCamera(false)}
-                        className="px-4 py-2 bg-gray-500 text-white rounded-full"
-                      >
-                        Batal
-                      </button>
-                    </div>
-                  </div>
-                ) : selectedFile ? (
-                  <div className="h-full flex items-center justify-center">
-                    <img
-                      src={URL.createObjectURL(selectedFile)}
-                      alt="Preview"
-                      className="max-h-full rounded-lg"
-                    />
-                  </div>
-                ) : (
-                  <div className="h-full flex flex-col items-center justify-center text-gray-400 text-sm">
-                    <Upload size={40} className="mb-2 text-gray-300" />
-                    <p className="text-center text-xs text-gray-300 mt-2">
-                      Klik disini atau seret file ke sini PNG/JPG/JPEG.
-                    </p>
-                  </div>
-                )}
               </div>
             </div>
           </div>
