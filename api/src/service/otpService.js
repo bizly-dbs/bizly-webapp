@@ -2,7 +2,7 @@ import { sendMail } from './emailService.js';
 import { generateOTPTemplate } from '../templates/emailTemplate.js';
 
 const otpCache = new Map();
-const OTP_TTL_MS = 60 * 60 * 1000; // 1 jam
+const OTP_TTL_MS = 10 * 60 * 1000; // 1 jam
 
 export function generateOTP() {
   return Math.floor(1000 + Math.random() * 9000).toString();
@@ -28,12 +28,18 @@ export async function sendOTP(email) {
 
 export function verifyOTP(email, code) {
   const record = otpCache.get(email);
-  if (!record) throw new Error('OTP tidak ditemukan atau telah kedaluwarsa');
+  if (!record) {
+    throw new Error(
+      "OTP tidak ditemukan, sudah digunakan, atau sesi Anda telah berakhir. Silakan minta OTP baru."
+    );
+  }
   if (Date.now() > record.expiresAt) {
     otpCache.delete(email);
-    throw new Error('OTP telah kedaluwarsa');
+    throw new Error("OTP telah kedaluwarsa. Silakan minta OTP baru.");
   }
-  if (record.code !== code) throw new Error('OTP tidak valid');
+  if (record.code !== code) {
+    throw new Error("OTP tidak valid.");
+  }
   otpCache.delete(email);
   return true;
 }
