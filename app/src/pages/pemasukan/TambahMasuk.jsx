@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Calendar, Plus, ChevronDown } from 'lucide-react'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
+import { transactionAPI, categoryAPI } from '../../services/api'
 
 const styles = {
   btn: "px-4 py-2 text-sm font-medium transition-colors rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2",
@@ -23,23 +24,31 @@ const TambahMasuk = () => {
     quantity: ''
   })
   
-  const [categories, setCategories] = useState([
-    { id: 1, name: 'Penjualan', selected: true },
-    { id: 2, name: 'Pembayaran', selected: false },
-    { id: 3, name: 'Penjualan Online', selected: false },
-  ])
-  
-  // Sample products for the dropdown
-  const [products, setProducts] = useState([
-    { id: 1, name: 'Iphone 14 pro' },
-    { id: 2, name: 'Xiomi 14T' },
-    { id: 3, name: 'Samsung A56' },
-    { id: 4, name: 'Xiomi 13t' },
-  ])
-  
+  const [categories, setCategories] = useState([])
+  const [products, setProducts] = useState([])
   const [newCategory, setNewCategory] = useState('')
   const [newProduct, setNewProduct] = useState('')
   const [isAddingProduct, setIsAddingProduct] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    fetchCategories()
+  }, [])
+
+  const fetchCategories = async () => {
+    try {
+      const categoriesData = await categoryAPI.getCategories('Pemasukan')
+      setCategories(categoriesData.map(cat => ({
+        id: cat.id,
+        name: cat.name,
+        selected: false
+      })))
+    } catch (err) {
+      setError(err.message)
+      console.error('Error fetching categories:', err)
+    }
+  }
   
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -58,14 +67,27 @@ const TambahMasuk = () => {
     )
   }
   
-  const handleAddCategory = () => {
-    if (newCategory.trim()) {
-      const newId = Math.max(...categories.map(c => c.id), 0) + 1
+  const handleAddCategory = async () => {
+    if (!newCategory.trim()) {
+      setError('Nama kategori tidak boleh kosong')
+      return
+    }
+
+    try {
+      const newCategoryData = await categoryAPI.createCategory({
+        name: newCategory.trim(),
+        type: 'Pemasukan'
+      })
+
       setCategories([
         ...categories.map(c => ({ ...c, selected: false })),
-        { id: newId, name: newCategory, selected: true }
+        { id: newCategoryData.id, name: newCategoryData.name, selected: true }
       ])
       setNewCategory('')
+      setError(null)
+    } catch (err) {
+      setError(err.message)
+      console.error('Error adding category:', err)
     }
   }
   
@@ -85,29 +107,40 @@ const TambahMasuk = () => {
     }
   }
   
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    setIsSubmitting(true)
+    setError(null)
     
-    const selectedCategory = categories.find(c => c.selected)?.name || ''
-    
-    // Format the date as dd/mm/yyyy
-    const formattedDate = selectedDate ? 
-      `${selectedDate.getDate().toString().padStart(2, '0')}/${
-        (selectedDate.getMonth() + 1).toString().padStart(2, '0')}/${
-        selectedDate.getFullYear()}` : ''
-    
-    const newEntry = {
-      date: formattedDate,
-      nominal: `Rp. ${formData.nominal},-`,
-      name: formData.transactionName,
-      category: selectedCategory,
-      type: 'Pembayaran',
-      productName: formData.productName,
-      quantity: formData.quantity
+    try {
+      const selectedCategory = categories.find(c => c.selected)
+      if (!selectedCategory) {
+        throw new Error('Pilih kategori terlebih dahulu')
+      }
+
+      const formattedDate = selectedDate ? 
+        `${selectedDate.getFullYear()}-${
+          (selectedDate.getMonth() + 1).toString().padStart(2, '0')}-${
+          selectedDate.getDate().toString().padStart(2, '0')}` : ''
+      
+      const transactionData = {
+        transaction_name: formData.transactionName,
+        amount: parseInt(formData.nominal.replace(/[^0-9]/g, '')),
+        category_name: selectedCategory.name,
+        product_name: formData.productName || null,
+        quantity: formData.quantity ? parseInt(formData.quantity) : null,
+        transaction_date: formattedDate,
+        type: 'Pemasukan'
+      }
+      
+      await transactionAPI.createTransaction(transactionData)
+      navigate('/pemasukan')
+    } catch (err) {
+      setError(err.message)
+      console.error('Error creating income:', err)
+    } finally {
+      setIsSubmitting(false)
     }
-    
-    console.log('New income entry:', newEntry)
-    navigate('/pemasukan')
   }
   
   return (
@@ -115,6 +148,12 @@ const TambahMasuk = () => {
       <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-sm p-6 md:p-8">
         <h1 className="text-2xl font-semibold text-center text-blue-500 mb-8">Tambah Pemasukan</h1>
         
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit}>
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">Tanggal</label>
@@ -283,14 +322,16 @@ const TambahMasuk = () => {
               type="button"
               onClick={() => navigate('/pemasukan')}
               className={`${styles.btn} ${styles.btnSecondary}`}
+              disabled={isSubmitting}
             >
               Batal
             </button>
             <button
               type="submit"
               className={`${styles.btn} ${styles.btnPrimary}`}
+              disabled={isSubmitting}
             >
-              Tambah
+              {isSubmitting ? 'Menambahkan...' : 'Tambah'}
             </button>
           </div>
         </form>

@@ -2,111 +2,103 @@ import { useState, useEffect } from 'react'
 import MonthIncomeCard from './IncomeCard'
 import AddButton from './AddButoon'
 import IncomeFilter from './IncomeFilter'
+import { transactionAPI, categoryAPI } from '../../services/api'
 
 const Pemasukan = () => {
-  const [incomeData, setIncomeData] = useState({
-    januari: [
-      { 
-        date: '12 /01 / 2025', 
-        nominal: 'Rp. 2.000.000,-', 
-        name: 'Penjualan', 
-        category: 'Penjualan',
-        product: 'Produk A',
-        quantity: '10',
-        type: 'Pembayaran'
-      },
-      { 
-        date: '14 /01 / 2025', 
-        nominal: 'Rp. 1.500.000,-', 
-        name: 'Pembayaran DP', 
-        category: 'Pembayaran',
-        product: 'Produk B',
-        quantity: '5',
-        type: 'Additional'
-      },
-      { 
-        date: '17 /01 / 2025', 
-        nominal: 'Rp. 450.000,-', 
-        name: 'Penjualan Online', 
-        category: 'Penjualan',
-        product: 'Produk C',
-        quantity: '3',
-        type: 'Additional'
-      },
-      { 
-        date: '23 /01 / 2025', 
-        nominal: 'Rp. 1.370.000,-', 
-        name: 'Reward', 
-        category: 'Bonus',
-        product: 'Produk D',
-        quantity: '7',
-        type: 'Additional'
-      },
-    ],
-    februari: [
-      { 
-        date: '12 /01 / 2025', 
-        nominal: 'Rp. 2.000.000,-', 
-        name: 'Penjualan', 
-        category: 'Penjualan',
-        product: 'Produk A',
-        quantity: '10',
-        type: 'Pembayaran'
-      },
-      { 
-        date: '14 /01 / 2025', 
-        nominal: 'Rp. 1.500.000,-', 
-        name: 'Pembayaran DP', 
-        category: 'Pembayaran',
-        product: 'Produk B',
-        quantity: '5',
-        type: 'Additional'
-      },
-      { 
-        date: '17 /01 / 2025', 
-        nominal: 'Rp. 450.000,-', 
-        name: 'Penjualan Online', 
-        category: 'Penjualan',
-        product: 'Produk C',
-        quantity: '3',
-        type: 'Additional'
-      },
-    ]
-  })
-
+  const [incomeData, setIncomeData] = useState({})
   const [filteredData, setFilteredData] = useState(null)
   const [categories, setCategories] = useState([])
   const [products, setProducts] = useState([])
-  
-  useEffect(() => {
-    const allCategories = new Set()
-    const allProducts = new Set()
-    
-    Object.values(incomeData).forEach(monthData => {
-      monthData.forEach(item => {
-        if (item.category) allCategories.add(item.category)
-        if (item.product) allProducts.add(item.product)
-      })
-    })
-    
-    setCategories([...allCategories])
-    setProducts([...allProducts])
-  }, [incomeData])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  const handleUpdateIncome = (month, index, updatedItem) => {
-    setIncomeData(prevData => ({
-      ...prevData,
-      [month.toLowerCase()]: prevData[month.toLowerCase()].map((item, i) => 
-        i === index ? updatedItem : item
-      )
-    }))
+  useEffect(() => {
+    fetchIncomeData()
+    fetchCategories()
+  }, [])
+
+  const fetchIncomeData = async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      const transactions = await transactionAPI.getTransactions('Pemasukan')
+      
+      // Group transactions by month
+      const groupedData = transactions.reduce((acc, transaction) => {
+        const date = new Date(transaction.transaction_date)
+        const month = date.toLocaleString('id-ID', { month: 'long' }).toLowerCase()
+        
+        const formattedTransaction = {
+          id: transaction.id,
+          date: `${date.getDate().toString().padStart(2, '0')} /${(date.getMonth() + 1).toString().padStart(2, '0')} / ${date.getFullYear()}`,
+          nominal: `Rp. ${transaction.amount.toLocaleString('id-ID')},-`,
+          name: transaction.transaction_name,
+          category: transaction.category_name,
+          product: transaction.product_name,
+          quantity: transaction.quantity?.toString(),
+          type: transaction.type
+        }
+
+        if (!acc[month]) {
+          acc[month] = []
+        }
+        acc[month].push(formattedTransaction)
+        return acc
+      }, {})
+
+      setIncomeData(groupedData)
+      
+      // Extract unique products
+      const uniqueProducts = [...new Set(transactions
+        .filter(t => t.product_name)
+        .map(t => t.product_name))]
+      setProducts(uniqueProducts)
+    } catch (err) {
+      setError(err.message)
+      console.error('Error fetching income data:', err)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const handleDeleteIncome = (month, index) => {
-    setIncomeData(prevData => ({
-      ...prevData,
-      [month.toLowerCase()]: prevData[month.toLowerCase()].filter((_, i) => i !== index)
-    }))
+  const fetchCategories = async () => {
+    try {
+      const categories = await categoryAPI.getCategories('Pemasukan')
+      setCategories(categories.map(cat => cat.name))
+    } catch (err) {
+      console.error('Error fetching categories:', err)
+    }
+  }
+
+  const handleUpdateIncome = async (month, index, updatedItem) => {
+    try {
+      const originalItem = incomeData[month][index]
+      const transactionData = {
+        transaction_name: updatedItem.name,
+        amount: parseInt(updatedItem.nominal.replace(/[^0-9]/g, '')),
+        category_name: updatedItem.category,
+        product_name: updatedItem.product || null,
+        quantity: updatedItem.quantity ? parseInt(updatedItem.quantity) : null,
+        type: 'Pemasukan'
+      }
+
+      await transactionAPI.updateTransaction(originalItem.id, transactionData)
+      await fetchIncomeData() // Refresh data after update
+    } catch (err) {
+      setError(err.message)
+      console.error('Error updating income:', err)
+    }
+  }
+
+  const handleDeleteIncome = async (month, index) => {
+    try {
+      const itemToDelete = incomeData[month][index]
+      await transactionAPI.deleteTransaction(itemToDelete.id)
+      await fetchIncomeData() // Refresh data after delete
+    } catch (err) {
+      setError(err.message)
+      console.error('Error deleting income:', err)
+    }
   }
   
   const handleApplyFilter = (filters) => {
@@ -172,6 +164,22 @@ const Pemasukan = () => {
   
   const displayData = filteredData || incomeData
   
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p className="text-gray-500">Loading...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p className="text-red-500">Error: {error}</p>
+      </div>
+    )
+  }
+
   return (
     <div className="max-w-full">
       <h1 className="text-xl font-semibold mb-4 md:hidden">Pemasukan</h1>
