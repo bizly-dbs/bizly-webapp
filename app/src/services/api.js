@@ -26,6 +26,12 @@ export const authAPI = {
       password: credentials.password
     });
     return response.data;
+  },
+
+  // Logout User
+  logout: async () => {
+    const response = await api.delete('/auth/logout');
+    return response.data;
   }
 };
 
