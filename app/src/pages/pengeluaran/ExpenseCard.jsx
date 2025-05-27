@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { MoreVertical, Pencil, Trash2 } from 'lucide-react'
+import { transactionAPI, categoryAPI } from '../../services/api'
 
 const DropdownMenu = ({ onEdit, onDelete }) => {
   return (
@@ -22,23 +23,85 @@ const DropdownMenu = ({ onEdit, onDelete }) => {
   )
 }
 
-const EditForm = ({ item, onSave, onCancel }) => {
+const EditForm = ({ item, onClose, onSave, categories }) => {
   const [editData, setEditData] = useState({
-    date: item.date,
-    nominal: item.nominal.replace('Rp. ', '').replace(',-', ''),
     name: item.name,
-    category: item.category
+    nominal: item.nominal.replace(/[^0-9]/g, ''),
+    date: new Date(item.date.split('/').reverse().join('-')).toISOString().split('T')[0],
+    categoryId: item.category_id || ''
   })
+  const [error, setError] = useState('')
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    // Set the initial category ID based on available data
+    let initialCategoryId = item.category_id
+
+    // If we have category.name but no category_id, try to find the matching category
+    if (item['category.name'] && !initialCategoryId && categories) {
+      const matchingCategory = categories.find(cat => cat.name === item['category.name'])
+      if (matchingCategory) {
+        initialCategoryId = matchingCategory.id
+      }
+    }
+
+    // If we still don't have a category ID but have a category name, try to find it
+    if (!initialCategoryId && item.category && categories) {
+      const matchingCategory = categories.find(cat => cat.name === item.category)
+      if (matchingCategory) {
+        initialCategoryId = matchingCategory.id
+      }
+    }
+
+    if (initialCategoryId) {
+      setEditData(prev => ({
+        ...prev,
+        categoryId: initialCategoryId
+      }))
+    }
+  }, [item, categories])
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    onSave({
-      ...item,
-      date: editData.date,
-      nominal: `Rp. ${editData.nominal},-`,
-      name: editData.name,
-      category: editData.category
-    })
+    setError('')
+
+    // Validate category
+    if (!editData.categoryId) {
+      setError('Kategori harus dipilih')
+      return
+    }
+
+    // Validate amount
+    const amount = parseInt(editData.nominal)
+    if (isNaN(amount) || amount <= 0) {
+      setError('Nominal harus lebih dari 0')
+      return
+    }
+
+    try {
+      const dataToSave = {
+        transaction_name: editData.name,
+        amount: amount,
+        transaction_date: editData.date,
+        category_id: editData.categoryId,
+        type: 'Pengeluaran'
+      }
+
+      await onSave(item.id, dataToSave)
+      onClose()
+    } catch (err) {
+      console.error('Error saving expense:', err)
+      setError('Gagal menyimpan perubahan')
+    }
+  }
+
+  if (error) {
+    return (
+      <tr className="border-b border-gray-200 bg-red-50">
+        <td colSpan="5" className="px-4 py-4">
+          <p className="text-red-500 text-center">{error}</p>
+        </td>
+      </tr>
+    )
   }
 
   return (
@@ -49,10 +112,11 @@ const EditForm = ({ item, onSave, onCancel }) => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
               <input
-                type="text"
+                type="date"
                 value={editData.date}
                 onChange={(e) => setEditData({ ...editData, date: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
               />
             </div>
             <div>
@@ -62,6 +126,7 @@ const EditForm = ({ item, onSave, onCancel }) => {
                 value={editData.nominal}
                 onChange={(e) => setEditData({ ...editData, nominal: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
               />
             </div>
             <div>
@@ -71,26 +136,30 @@ const EditForm = ({ item, onSave, onCancel }) => {
                 value={editData.name}
                 onChange={(e) => setEditData({ ...editData, name: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
               <select
-                value={editData.category}
-                onChange={(e) => setEditData({ ...editData, category: e.target.value })}
+                value={editData.categoryId}
+                onChange={(e) => setEditData({ ...editData, categoryId: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
               >
-                <option value="Operasional">Operasional</option>
-                <option value="Belanja">Belanja</option>
-                <option value="Pembayaran">Pembayaran</option>
-                <option value="Lainnya">Lainnya</option>
+                <option value="">Pilih Kategori</option>
+                {Array.isArray(categories) && categories.map(category => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
           <div className="flex justify-end gap-2">
             <button
               type="button"
-              onClick={onCancel}
+              onClick={onClose}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
             >
               Batal
@@ -109,6 +178,36 @@ const EditForm = ({ item, onSave, onCancel }) => {
 }
 
 const DeleteConfirmation = ({ onConfirm, onCancel }) => {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+
+  const handleConfirm = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      await onConfirm()
+    } catch (error) {
+      console.error('Failed to delete expense:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      })
+      setError('Gagal menghapus pengeluaran')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (error) {
+    return (
+      <tr className="border-b border-gray-200 bg-red-50">
+        <td colSpan="5" className="px-4 py-4">
+          <p className="text-red-500 text-center">{error}</p>
+        </td>
+      </tr>
+    )
+  }
+
   return (
     <tr className="border-b border-gray-200 bg-red-50">
       <td colSpan="5" className="px-4 py-4">
@@ -118,14 +217,16 @@ const DeleteConfirmation = ({ onConfirm, onCancel }) => {
             <button
               onClick={onCancel}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              disabled={loading}
             >
               Batal
             </button>
             <button
-              onClick={onConfirm}
+              onClick={handleConfirm}
               className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+              disabled={loading}
             >
-              Hapus
+              {loading ? 'Menghapus...' : 'Hapus'}
             </button>
           </div>
         </div>
@@ -134,45 +235,61 @@ const DeleteConfirmation = ({ onConfirm, onCancel }) => {
   )
 }
 
-const ExpenseRow = ({ item, onSave, onDelete }) => {
+const ExpenseRow = ({ item, onSave, onDelete, categories }) => {
   const [showDropdown, setShowDropdown] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+
+  const getCategoryName = (item) => {
+    if (item['category.name']) return item['category.name']
+    if (item.category_id && categories) {
+      const category = categories.find(cat => String(cat.id) === String(item.category_id))
+      return category ? category.name : 'Tanpa Kategori'
+    }
+    if (item.category) return item.category
+    return 'Tanpa Kategori'
+  }
   
+
   const handleEdit = () => {
     setIsEditing(true)
     setShowDropdown(false)
   }
-  
+
   const handleDelete = () => {
     setIsDeleting(true)
     setShowDropdown(false)
   }
-  
-  const handleSave = (updatedItem) => {
-    onSave(updatedItem)
+
+  const handleSave = async (id, updatedItem) => {
+    // Ensure we're sending category_id in the update
+    const dataToUpdate = {
+      ...updatedItem,
+      category_id: updatedItem.categoryId // Map categoryId to category_id for API
+    }
+    await onSave(id, dataToUpdate)
     setIsEditing(false)
   }
-  
+
   const handleConfirmDelete = () => {
     onDelete(item)
     setIsDeleting(false)
   }
 
   if (isEditing) {
-    return <EditForm item={item} onSave={handleSave} onCancel={() => setIsEditing(false)} />
+    return <EditForm item={item} onSave={handleSave} onClose={() => setIsEditing(false)} categories={categories} />
   }
 
   if (isDeleting) {
     return <DeleteConfirmation onConfirm={handleConfirmDelete} onCancel={() => setIsDeleting(false)} />
   }
-  
+
   return (
     <tr className="border-b border-gray-200 hover:bg-gray-50">
       <td className="px-4 py-4 text-sm text-gray-700">{item.date}</td>
       <td className="px-4 py-4 text-sm font-medium text-gray-900">{item.nominal}</td>
       <td className="px-4 py-4 text-sm text-gray-700">{item.name}</td>
-      <td className="px-4 py-4 text-sm text-gray-700">{item.category}</td>
+      <td className="px-4 py-4 text-sm text-gray-700">{getCategoryName(item)}</td>
       <td className="px-4 py-4 text-right relative">
         <button 
           onClick={() => setShowDropdown(!showDropdown)}
@@ -180,16 +297,14 @@ const ExpenseRow = ({ item, onSave, onDelete }) => {
         >
           <MoreVertical size={20} className="text-gray-600" />
         </button>
-        
-        {showDropdown && (
-          <DropdownMenu onEdit={handleEdit} onDelete={handleDelete} />
-        )}
+        {showDropdown && <DropdownMenu onEdit={handleEdit} onDelete={handleDelete} />}
       </td>
     </tr>
   )
 }
 
-const MonthExpenseCard = ({ month, expenseList, onUpdateExpense, onDeleteExpense }) => {
+
+const MonthExpenseCard = ({ month, expenseList, onUpdateExpense, onDeleteExpense, categories }) => {
   return (
     <div className="bg-white rounded-2xl shadow-sm p-4 font-['Poppins'] mb-6 overflow-hidden">
       <h2 className="text-xl font-semibold p-5 text-gray-800">{month}</h2>
@@ -210,8 +325,9 @@ const MonthExpenseCard = ({ month, expenseList, onUpdateExpense, onDeleteExpense
               <ExpenseRow 
                 key={index} 
                 item={item} 
-                onSave={(updatedItem) => onUpdateExpense(month, index, updatedItem)}
+                onSave={(id, updatedItem) => onUpdateExpense(month, index, updatedItem)}
                 onDelete={() => onDeleteExpense(month, index)}
+                categories={categories}
               />
             ))}
           </tbody>

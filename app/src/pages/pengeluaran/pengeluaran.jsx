@@ -2,79 +2,82 @@ import { useState, useEffect } from 'react';
 import MonthExpenseCard from './ExpenseCard';
 import AddButton from './AddButton';
 import ExpenseFilter from './ExpenseFilter';
+import { transactionAPI, categoryAPI } from '../../services/api';
 
 const Pengeluaran = () => {
-  const [expenseData, setExpenseData] = useState({
-    januari: [
-      { 
-        date: '05/01/2025', 
-        nominal: 'Rp. 1.200.000,-', 
-        name: 'Sewa Tempat', 
-        category: 'Operasional',
-        type: 'Tetap'
-      },
-      { 
-        date: '08/01/2025', 
-        nominal: 'Rp. 800.000,-', 
-        name: 'Pembelian Bahan', 
-        category: 'Bahan Baku',
-        type: 'Variabel'
-      },
-      { 
-        date: '15/01/2025', 
-        nominal: 'Rp. 350.000,-', 
-        name: 'Biaya Listrik', 
-        category: 'Utilitas',
-        type: 'Tetap'
-      },
-      { 
-        date: '22/01/2025', 
-        nominal: 'Rp. 500.000,-', 
-        name: 'Gaji Karyawan', 
-        category: 'Gaji',
-        type: 'Tetap'
-      },
-    ],
-    februari: [
-      { 
-        date: '04/02/2025', 
-        nominal: 'Rp. 1.200.000,-', 
-        name: 'Sewa Tempat', 
-        category: 'Operasional',
-        type: 'Tetap'
-      },
-      { 
-        date: '10/02/2025', 
-        nominal: 'Rp. 950.000,-', 
-        name: 'Pembelian Bahan', 
-        category: 'Bahan Baku',
-        type: 'Variabel'
-      },
-      { 
-        date: '16/02/2025', 
-        nominal: 'Rp. 375.000,-', 
-        name: 'Biaya Listrik', 
-        category: 'Utilitas',
-        type: 'Tetap'
-      },
-    ]
-  });
-  
+  const [expenseData, setExpenseData] = useState({});
   const [filteredData, setFilteredData] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  // Fetch expenses on component mount
   useEffect(() => {
-    // Extract unique categories from expense data
-    const allCategories = new Set();
+    const fetchExpenses = async () => {
+      console.log('Fetching expenses...')
+      try {
+        const response = await transactionAPI.getTransactions('Pengeluaran')
+        console.log('Expenses fetched successfully:', response)
+        
+        // Group expenses by month
+        const groupedByMonth = response.reduce((acc, transaction) => {
+          const date = new Date(transaction.transaction_date)
+          const month = date.toLocaleString('id-ID', { month: 'long' }).toLowerCase()
+          
+          if (!acc[month]) {
+            acc[month] = []
+          }
+          
+          acc[month].push({
+            id: transaction.id,
+            date: date.toLocaleDateString('id-ID'),
+            nominal: `Rp. ${transaction.amount.toLocaleString('id-ID')},-`,
+            name: transaction.transaction_name,
+            category: transaction['category.name'] || 'Uncategorized',
+            categoryId: transaction['category.id'] || null,
+            type: transaction.type
+          })
+          
+          return acc
+        }, {})
+        
+        console.log('Expenses grouped by month:', groupedByMonth)
+        setExpenseData(groupedByMonth)
+        setLoading(false)
+      } catch (error) {
+        console.error('Failed to fetch expenses:', {
+          message: error.message,
+          response: error.response?.data,
+          status: error.response?.status
+        })
+        setError('Gagal memuat data pengeluaran')
+        setLoading(false)
+      }
+    }
     
-    Object.values(expenseData).forEach(monthData => {
-      monthData.forEach(expense => {
-        allCategories.add(expense.category);
-      });
-    });
+    fetchExpenses()
+  }, [])
+
+  // Add a new useEffect to fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      console.log('Fetching categories...')
+      try {
+        const response = await categoryAPI.getCategories()
+        console.log('Categories fetched successfully:', response)
+        setCategories(response)  // Store full category objects
+      } catch (error) {
+        console.error('Failed to fetch categories:', {
+          message: error.message,
+          response: error.response?.data,
+          status: error.response?.status
+        })
+        setError('Gagal memuat kategori')
+      }
+    }
     
-    setCategories([...allCategories]);
-  }, [expenseData]);
+    fetchCategories()
+  }, [])
 
   // Store expense data in localStorage when it changes
   useEffect(() => {
@@ -91,21 +94,232 @@ const Pengeluaran = () => {
     }
   }, []);
 
-  const handleUpdateExpense = (month, index, updatedItem) => {
-    setExpenseData(prevData => ({
-      ...prevData,
-      [month.toLowerCase()]: prevData[month.toLowerCase()].map((item, i) => 
-        i === index ? updatedItem : item
-      )
-    }));
-  };
+  const handleUpdateExpense = async (month, index, updatedItem) => {
+    console.log('Updating expense:', { month, index, updatedItem })
+    try {
+      // Add safety checks
+      if (!expenseData || !expenseData[month] || !expenseData[month][index]) {
+        console.error('Invalid expense data:', { month, index, expenseData })
+        throw new Error('Data pengeluaran tidak valid')
+      }
 
-  const handleDeleteExpense = (month, index) => {
-    setExpenseData(prevData => ({
-      ...prevData,
-      [month.toLowerCase()]: prevData[month.toLowerCase()].filter((_, i) => i !== index)
-    }));
-  };
+      const originalItem = expenseData[month][index]
+      console.log('Original item:', originalItem)
+
+      if (!originalItem.id) {
+        console.error('Missing expense ID:', originalItem)
+        throw new Error('ID pengeluaran tidak valid')
+      }
+
+      // Ensure we have all required fields
+      if (!updatedItem.transaction_name || !updatedItem.amount || !updatedItem.transaction_date || !updatedItem.category_id) {
+        console.error('Missing required fields:', updatedItem)
+        throw new Error('Data pengeluaran tidak lengkap')
+      }
+
+      const response = await transactionAPI.updateTransaction(originalItem.id, {
+        transaction_name: updatedItem.transaction_name,
+        amount: updatedItem.amount,
+        category_id: updatedItem.category_id,
+        transaction_date: updatedItem.transaction_date,
+        type: 'Pengeluaran'
+      })
+
+      if (!response) {
+        throw new Error('Gagal mengupdate pengeluaran')
+      }
+
+      // Refresh expenses after successful update
+      const updatedResponse = await transactionAPI.getTransactions('Pengeluaran')
+      if (!updatedResponse) {
+        throw new Error('Gagal memuat data terbaru')
+      }
+
+      const updatedGroupedData = updatedResponse.reduce((acc, transaction) => {
+        if (!transaction.transaction_date) {
+          console.warn('Transaction missing date:', transaction)
+          return acc
+        }
+
+        const date = new Date(transaction.transaction_date)
+        if (isNaN(date.getTime())) {
+          console.warn('Invalid transaction date:', transaction.transaction_date)
+          return acc
+        }
+
+        const month = date.toLocaleString('id-ID', { month: 'long' }).toLowerCase()
+        
+        if (!acc[month]) {
+          acc[month] = []
+        }
+        
+        acc[month].push({
+          id: transaction.id,
+          date: date.toLocaleDateString('id-ID'),
+          nominal: `Rp. ${transaction.amount.toLocaleString('id-ID')},-`,
+          name: transaction.transaction_name,
+          category: transaction['category.name'] || 'Uncategorized',
+          category_id: transaction['category.id'] || null,
+          type: transaction.type
+        })
+        
+        return acc
+      }, {})
+      
+      console.log('Updated grouped data:', updatedGroupedData)
+      setExpenseData(updatedGroupedData)
+    } catch (error) {
+      console.error('Failed to update expense:', {
+        message: error.message,
+        status: error.status,
+        month,
+        index,
+        updatedItem
+      })
+      setError('Gagal mengupdate pengeluaran')
+    }
+  }
+
+  const handleDeleteExpense = async (month, index) => {
+    console.log('=== DELETE EXPENSE START ===')
+    console.log('Delete request params:', { month, index })
+    console.log('Current expense data:', expenseData)
+    console.log('Available months:', Object.keys(expenseData))
+    
+    try {
+      const monthKey = month.toLowerCase()
+      console.log('Normalized month key:', monthKey)
+      console.log('Data for month:', expenseData[monthKey])
+      
+      if (!expenseData || !expenseData[monthKey] || !expenseData[monthKey][index]) {
+        console.error('=== DELETE VALIDATION FAILED ===')
+        console.error('Invalid expense data:', { 
+          originalMonth: month,
+          monthKey,
+          index, 
+          availableMonths: Object.keys(expenseData),
+          monthData: expenseData[monthKey],
+          expenseData 
+        })
+        throw new Error('Data pengeluaran tidak valid')
+      }
+
+      const itemToDelete = expenseData[monthKey][index]
+      console.log('=== ITEM TO DELETE ===')
+      console.log('Item details:', itemToDelete)
+      console.log('Item ID:', itemToDelete.id)
+
+      if (!itemToDelete.id) {
+        console.error('=== DELETE ID VALIDATION FAILED ===')
+        console.error('Missing expense ID:', itemToDelete)
+        throw new Error('ID pengeluaran tidak valid')
+      }
+
+      console.log('=== SENDING DELETE REQUEST ===')
+      console.log('Delete URL:', `/api/transactions/${itemToDelete.id}`)
+      const response = await fetch(`/api/transactions/${itemToDelete.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+
+      console.log('=== DELETE RESPONSE ===')
+      console.log('Response status:', response.status)
+      console.log('Response ok:', response.ok)
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        console.error('=== DELETE REQUEST FAILED ===')
+        console.error('Delete failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData,
+          headers: Object.fromEntries(response.headers.entries())
+        })
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+      console.log('=== DELETE SUCCESS ===')
+      console.log('Delete response data:', data)
+      
+      console.log('=== FETCHING UPDATED DATA ===')
+      const updatedResponse = await fetch('/api/transactions?type=Pengeluaran')
+      console.log('Update fetch status:', updatedResponse.status)
+      console.log('Update fetch ok:', updatedResponse.ok)
+
+      if (!updatedResponse.ok) {
+        console.error('=== UPDATE FETCH FAILED ===')
+        console.error('Update fetch failed:', {
+          status: updatedResponse.status,
+          statusText: updatedResponse.statusText
+        })
+        throw new Error(`HTTP error! status: ${updatedResponse.status}`)
+      }
+      
+      const updatedData = await updatedResponse.json()
+      console.log('=== UPDATED DATA ===')
+      console.log('Raw updated data:', updatedData)
+      console.log('Data length:', updatedData.length)
+
+      if (!Array.isArray(updatedData)) {
+        console.error('=== INVALID DATA FORMAT ===')
+        console.error('Invalid response format:', updatedData)
+        throw new Error('Format data tidak valid')
+      }
+
+      console.log('=== PROCESSING UPDATED DATA ===')
+      const updatedGroupedData = updatedData.reduce((acc, transaction) => {
+        if (!transaction.transaction_date) {
+          console.warn('Transaction missing date:', transaction)
+          return acc
+        }
+
+        const date = new Date(transaction.transaction_date)
+        if (isNaN(date.getTime())) {
+          console.warn('Invalid transaction date:', transaction.transaction_date)
+          return acc
+        }
+
+        const month = date.toLocaleString('id-ID', { month: 'long' }).toLowerCase()
+        
+        if (!acc[month]) {
+          acc[month] = []
+        }
+        
+        acc[month].push({
+          id: transaction.id,
+          date: date.toLocaleDateString('id-ID'),
+          nominal: `Rp. ${transaction.amount.toLocaleString('id-ID')},-`,
+          name: transaction.transaction_name,
+          category: transaction['category.name'] || 'Uncategorized',
+          categoryId: transaction['category.id'] || null,
+          type: transaction.type
+        })
+        
+        return acc
+      }, {})
+      
+      console.log('=== FINAL GROUPED DATA ===')
+      console.log('Updated grouped data:', updatedGroupedData)
+      console.log('Available months after update:', Object.keys(updatedGroupedData))
+      console.log('=== DELETE EXPENSE COMPLETE ===')
+      
+      setExpenseData(updatedGroupedData)
+    } catch (error) {
+      console.error('=== DELETE EXPENSE ERROR ===')
+      console.error('Error details:', {
+        message: error.message,
+        status: error.status,
+        month,
+        index,
+        availableMonths: Object.keys(expenseData),
+        stack: error.stack
+      })
+      setError('Gagal menghapus pengeluaran')
+    }
+  }
   
   const handleApplyFilter = (filters) => {
     console.log('Applying filters:', filters);
@@ -167,6 +381,22 @@ const Pengeluaran = () => {
   
   const displayData = filteredData || expenseData;
   
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6 font-['Poppins'] flex items-center justify-center">
+        <p className="text-gray-500">Memuat data...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6 font-['Poppins'] flex items-center justify-center">
+        <p className="text-red-500">{error}</p>
+      </div>
+    )
+  }
+  
   return (
     <div className="min-h-screen bg-gray-50 p-6 font-['Poppins']">
       <h1 className="text-xl font-semibold mb-4 md:hidden">Pengeluaran</h1>
@@ -181,6 +411,7 @@ const Pengeluaran = () => {
               expenseList={data}
               onUpdateExpense={handleUpdateExpense}
               onDeleteExpense={handleDeleteExpense}
+              categories={categories}
             />
           ))}
           

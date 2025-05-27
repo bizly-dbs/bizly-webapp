@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Calendar } from 'lucide-react'
+import { Calendar, Plus, X } from 'lucide-react'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
+import { transactionAPI, categoryAPI } from '../../services/api'
 
 const styles = {
   btn: "px-4 py-2 text-sm font-medium transition-colors rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2",
@@ -17,8 +18,30 @@ const TambahKeluar = () => {
   const [formData, setFormData] = useState({
     nominal: '',
     transactionName: '',
-    category: '',
+    categoryId: '',
   })
+  const [categories, setCategories] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [newCategoryName, setNewCategoryName] = useState('')
+  const [isAddingCategory, setIsAddingCategory] = useState(false)
+  
+  useEffect(() => {
+    fetchCategories()
+  }, [])
+  
+  const fetchCategories = async () => {
+    try {
+      const response = await categoryAPI.getCategories('Pengeluaran')
+      setCategories(response.map(cat => ({
+        ...cat,
+        selected: false
+      })))
+    } catch (error) {
+      console.error('Failed to fetch categories:', error)
+      setError('Gagal memuat kategori')
+    }
+  }
   
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -27,25 +50,104 @@ const TambahKeluar = () => {
       [name]: value
     })
   }
+
+  const handleCategorySelect = (id) => {
+    setCategories(
+      categories.map(cat => ({
+        ...cat,
+        selected: cat.id === id
+      }))
+    )
+    setFormData(prev => ({
+      ...prev,
+      categoryId: id
+    }))
+  }
   
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    
-    const formattedDate = selectedDate ? 
-      `${selectedDate.getDate().toString().padStart(2, '0')}/${
-        (selectedDate.getMonth() + 1).toString().padStart(2, '0')}/${
-        selectedDate.getFullYear()}` : ''
-    
-    const newEntry = {
-      date: formattedDate,
-      nominal: `Rp. ${formData.nominal},-`,
-      name: formData.transactionName,
-      category: formData.category,
-      type: 'Pengeluaran'
+  const handleAddCategory = async () => {
+    if (!newCategoryName.trim()) {
+      setError('Nama kategori tidak boleh kosong')
+      return
     }
+
+    setIsAddingCategory(true)
+    setError(null)
+
+    try {
+      await categoryAPI.createCategory({
+        name: newCategoryName.trim(),
+        type: 'Pengeluaran'
+      })
+
+      // Fetch updated categories list after adding new category
+      await fetchCategories()
+      
+      setNewCategoryName('')
+    } catch (error) {
+      console.error('Failed to add category:', error)
+      setError(error.message || 'Gagal menambahkan kategori')
+    } finally {
+      setIsAddingCategory(false)
+    }
+  }
+
+  const handleDeleteCategory = async (categoryId) => {
+    if (!categoryId) return
+
+    try {
+      await categoryAPI.deleteCategory(categoryId)
+      
+      // Update categories list and clear selection if deleted category was selected
+      setCategories(prev => prev.filter(cat => cat.id !== categoryId))
+      if (formData.categoryId === categoryId) {
+        setFormData(prev => ({ ...prev, categoryId: '' }))
+      }
+    } catch (error) {
+      console.error('Failed to delete category:', error)
+      setError(error.message || 'Gagal menghapus kategori')
+    }
+  }
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
     
-    console.log('New expense entry:', newEntry)
-    navigate('/pengeluaran')
+    try {
+      const selectedCategory = categories.find(c => c.selected)
+      if (!selectedCategory) {
+        throw new Error('Pilih kategori terlebih dahulu')
+      }
+
+      const formattedDate = selectedDate ? 
+        `${selectedDate.getFullYear()}-${
+          (selectedDate.getMonth() + 1).toString().padStart(2, '0')}-${
+          selectedDate.getDate().toString().padStart(2, '0')}` : ''
+      
+      const transactionData = {
+        transaction_name: formData.transactionName,
+        amount: parseInt(formData.nominal.replace(/[^0-9]/g, '')),
+        category_id: selectedCategory.id,
+        transaction_date: formattedDate,
+        type: 'Pengeluaran'
+      }
+      
+      await transactionAPI.createTransaction(transactionData)
+      navigate('/pengeluaran')
+    } catch (error) {
+      console.error('Failed to create expense:', error)
+      setError(error.message || 'Gagal menambahkan pengeluaran')
+    } finally {
+      setLoading(false)
+    }
+  }
+  
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6 font-['Poppins'] flex items-center justify-center">
+        <p className="text-red-500">{error}</p>
+      </div>
+    )
   }
   
   return (
@@ -53,6 +155,12 @@ const TambahKeluar = () => {
       <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-sm p-6 md:p-8">
         <h1 className="text-2xl font-semibold text-center text-blue-500 mb-8">Tambah Pengeluaran</h1>
         
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-500 text-sm">{error}</p>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit}>
           <div className="mb-6">
             <label className="block text-sm font-medium text-blue-600 mb-2">Tanggal</label>
@@ -100,24 +208,55 @@ const TambahKeluar = () => {
           
           <div className="mb-8">
             <label className="block text-sm font-medium text-blue-600 mb-2">Kategori</label>
-            <div className="relative">
-              <select
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                className={styles.inputField + " appearance-none pr-10"}
-                required
-              >
-                <option value="" disabled>Pilih Kategori</option>
-                <option value="Operasional">Operasional</option>
-                <option value="Belanja">Belanja</option>
-                <option value="Pembayaran">Pembayaran</option>
-                <option value="Lainnya">Lainnya</option>
-              </select>
-              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                <svg className="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
+            <div className="border border-gray-300 rounded-lg p-4">
+              <div className="flex flex-wrap gap-2 mb-4">
+                {categories.map(category => (
+                  <div key={category.id} className="relative group">
+                    <button
+                      type="button"
+                      onClick={() => handleCategorySelect(category.id)}
+                      className={`px-3 py-1 text-sm rounded-md flex items-center ${
+                        category.selected 
+                          ? 'bg-blue-500 text-white' 
+                          : 'bg-white text-gray-700 border border-gray-300'
+                      }`}
+                    >
+                      <span className={`w-4 h-4 rounded-full mr-2 flex items-center justify-center ${
+                        category.selected ? 'bg-white text-blue-500' : 'bg-blue-500 text-white'
+                      }`}>
+                        {category.selected && '✓'}
+                      </span>
+                      {category.name}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteCategory(category.id)}
+                      className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      title="Hapus kategori"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  placeholder="Nama kategori baru"
+                  className="border border-gray-300 rounded-md px-3 py-1 text-sm flex-1"
+                  disabled={isAddingCategory}
+                />
+                <button
+                  type="button"
+                  onClick={handleAddCategory}
+                  className={`${styles.btn} ${styles.btnPrimary} text-sm`}
+                  disabled={isAddingCategory}
+                >
+                  {isAddingCategory ? 'Menambahkan...' : 'Tambah Kategori'}
+                </button>
               </div>
             </div>
           </div>
@@ -127,14 +266,16 @@ const TambahKeluar = () => {
               type="button"
               onClick={() => navigate('/pengeluaran')}
               className={`${styles.btn} ${styles.btnSecondary}`}
+              disabled={loading}
             >
               Batal
             </button>
             <button
               type="submit"
               className={`${styles.btn} ${styles.btnPrimary}`}
+              disabled={loading}
             >
-              Simpan
+              {loading ? 'Menyimpan...' : 'Simpan'}
             </button>
           </div>
         </form>

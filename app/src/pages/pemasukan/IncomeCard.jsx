@@ -208,6 +208,7 @@ const IncomeRow = ({ item, onSave, onDelete }) => {
       </td>
     </tr>
   )
+
 }
 
 const MonthIncomeCard = ({ month, incomeList, onUpdateIncome, onDeleteIncome }) => {
