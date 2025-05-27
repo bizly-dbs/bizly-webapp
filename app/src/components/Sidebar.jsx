@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logoImg from '../assets/Bizly-logo.png';
+import { authAPI } from '../services/api';
 
 // Import Material UI Icons
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -18,15 +19,23 @@ const Sidebar = () => {
   const isActive = (path) => location.pathname === path;
 
   const handleLogout = () => {
+    console.log('Opening logout modal from sidebar...');
     setShowLogoutModal(true);
   };
 
-  const confirmLogout = () => {
-    // Add any logout logic here (clear tokens, etc.)
-    navigate('/');
+  const confirmLogout = async () => {
+    try {
+      console.log('Attempting to logout from sidebar...');
+      const response = await authAPI.logout();
+      console.log('Logout successful from sidebar:', response);
+      navigate('/');
+    } catch (error) {
+      console.error('Logout failed from sidebar:', error.response?.data || error.message);
+    }
   };
 
   const cancelLogout = () => {
+    console.log('Logout cancelled by user from sidebar');
     setShowLogoutModal(false);
   };
 

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { authAPI } from '../services/api';
 import logo from '../assets/Bizly-logo.png';
 
 const Register = () => {
@@ -19,10 +20,15 @@ const Register = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Register form submitted:', formData);
-    navigate('/login');
+    try {
+      const response = await authAPI.register(formData);
+      console.log('Registration successful:', response);
+      navigate('/login');
+    } catch (error) {
+      console.error('Registration failed:', error.response?.data || error.message);
+    }
   };
 
   return (
