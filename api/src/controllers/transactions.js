@@ -145,6 +145,7 @@ export const getTransactionById = async (req, res) => {
         "description",
         "type",
         "transaction_date",
+        "category_id",
       ],
       include: [
         {
