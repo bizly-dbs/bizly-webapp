@@ -97,12 +97,11 @@ export const createTransaction = async (req, res) => {
 };
 
 export const updateTransaction = async (req, res) => {
-  const { transaction_name, amount, description, type, transaction_date } =
-    req.body;
+  const { transaction_name, amount, description, type, transaction_date, category_id } = req.body;
   const id = req.params.id;
   try {
     await Transactions.update(
-      { transaction_name, amount, description, type, transaction_date },
+      { transaction_name, amount, description, type, transaction_date, category_id },
       {
         where: {
           id,
