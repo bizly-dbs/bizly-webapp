@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { authAPI } from '../services/api';
 import logo from '../assets/Bizly-logo.png';
 
 const Login = () => {
@@ -19,10 +20,15 @@ const Login = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login form submitted:', formData);
-    navigate('/dashboard');
+    try {
+      const response = await authAPI.login(formData);
+      console.log('Login successful:', response);
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Login failed:', error.response?.data || error.message);
+    }
   };
 
   return (
