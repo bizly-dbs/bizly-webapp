@@ -110,7 +110,20 @@ export const updateTransaction = async (req, res) => {
         },
       }
     );
-    res.status(200).json({ message: "Transaksi berhasil diupdate" });
+    const updatedTransaction = await Transactions.findOne({
+        where: { id, user_id: req.userId },
+        attributes: [
+        "id",
+        "user_id",
+        "category_id",
+        "transaction_name",
+        "amount",
+        "description",
+        "type",
+        "transaction_date",
+      ],
+      })
+    res.status(200).json({ message: "Transaksi berhasil diupdate", data: updatedTransaction });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
