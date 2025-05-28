@@ -13,7 +13,7 @@ export const getCategories = async (req, res) => {
         }
         const categories = await Categories.findAll({ 
             where,
-            attributes: ["id","name", "description" ],
+            attributes: ["id","name", "description", "type" ],
             include: [
                 {
                     model: Users,
@@ -74,6 +74,32 @@ export const deleteCategory = async (req, res) => {
             }
         });
         res.status(200).json({ message: "Kategori berhasil dihapus" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+export const getCategoryById = async (req, res) => {
+    const id = req.params.id;
+    try{
+        const category = await Categories.findOne({
+            where: {
+                id,
+                user_id: req.userId,
+            },
+            attributes: ["id", "name", "description", "type"],
+            include: [
+                {
+                    model: Users,
+                    attributes: ["id", "username"]
+                }
+            ],
+            raw: true,
+        });
+        if (!category) {
+            return res.status(404).json({ message: "Kategori tidak ditemukan" });
+        }
+        res.status(200).json(category);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
