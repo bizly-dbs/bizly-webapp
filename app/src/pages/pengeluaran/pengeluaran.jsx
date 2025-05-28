@@ -11,6 +11,26 @@ const Pengeluaran = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Helper function to format date consistently
+  const formatDateForDisplay = (dateString) => {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      console.warn('Invalid date:', dateString);
+      return dateString; // Return original if invalid
+    }
+    return date.toLocaleDateString('id-ID', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  };
+
+  // Helper function to parse display date back to ISO
+  const parseDisplayDateToISO = (displayDate) => {
+    const [day, month, year] = displayDate.split('/');
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  };
+
   // Fetch expenses on component mount
   useEffect(() => {
     const fetchExpenses = async () => {
@@ -21,25 +41,29 @@ const Pengeluaran = () => {
         
         // Group expenses by month
         const groupedByMonth = response.reduce((acc, transaction) => {
-          const date = new Date(transaction.transaction_date)
-          const month = date.toLocaleString('id-ID', { month: 'long' }).toLowerCase()
+          const date = new Date(transaction.transaction_date);
+          if (isNaN(date.getTime())) {
+            console.warn('Invalid transaction date:', transaction.transaction_date);
+            return acc;
+          }
+          const month = date.toLocaleString('id-ID', { month: 'long' }).toLowerCase();
           
           if (!acc[month]) {
-            acc[month] = []
+            acc[month] = [];
           }
           
           acc[month].push({
             id: transaction.id,
-            date: date.toLocaleDateString('id-ID'),
-            nominal: `Rp. ${transaction.amount.toLocaleString('id-ID')},-`,
+            date: formatDateForDisplay(transaction.transaction_date),
+            nominal: `Rp. ${parseFloat(transaction.amount).toLocaleString('id-ID')},-`,
             name: transaction.transaction_name,
             category: transaction['category.name'] || 'Uncategorized',
-            categoryId: transaction['category.id'] || null,
+            categoryId: transaction['category_id'] || null,
             type: transaction.type
-          })
+          });
           
-          return acc
-        }, {})
+          return acc;
+        }, {});
         
         console.log('Expenses grouped by month:', groupedByMonth)
         setExpenseData(groupedByMonth)
@@ -97,13 +121,19 @@ const Pengeluaran = () => {
   const handleUpdateExpense = async (month, index, updatedItem) => {
     console.log('Updating expense:', { month, index, updatedItem })
     try {
-      // Add safety checks
-      if (!expenseData || !expenseData[month] || !expenseData[month][index]) {
-        console.error('Invalid expense data:', { month, index, expenseData })
-        throw new Error('Data pengeluaran tidak valid')
+      // Add safety checks for month and index
+      const monthKey = month.toLowerCase()
+      if (!expenseData || !expenseData[monthKey]) {
+        console.error('Invalid month:', { month, monthKey, availableMonths: Object.keys(expenseData) })
+        throw new Error('Bulan tidak valid')
       }
 
-      const originalItem = expenseData[month][index]
+      if (!Array.isArray(expenseData[monthKey]) || !expenseData[monthKey][index]) {
+        console.error('Invalid index:', { month, monthKey, index, monthData: expenseData[monthKey] })
+        throw new Error('Index tidak valid')
+      }
+
+      const originalItem = expenseData[monthKey][index]
       console.log('Original item:', originalItem)
 
       if (!originalItem.id) {
@@ -111,23 +141,54 @@ const Pengeluaran = () => {
         throw new Error('ID pengeluaran tidak valid')
       }
 
-      // Ensure we have all required fields
-      if (!updatedItem.transaction_name || !updatedItem.amount || !updatedItem.transaction_date || !updatedItem.category_id) {
-        console.error('Missing required fields:', updatedItem)
-        throw new Error('Data pengeluaran tidak lengkap')
+      // Validate updated item data
+      if (!updatedItem || typeof updatedItem !== 'object') {
+        console.error('Invalid updated item:', updatedItem)
+        throw new Error('Data update tidak valid')
       }
 
-      const response = await transactionAPI.updateTransaction(originalItem.id, {
-        transaction_name: updatedItem.transaction_name,
-        amount: updatedItem.amount,
-        category_id: updatedItem.category_id,
-        transaction_date: updatedItem.transaction_date,
-        type: 'Pengeluaran'
+      // Ensure we have all required fields with proper types
+      const requiredFields = {
+        transaction_name: 'string',
+        amount: 'number',
+        transaction_date: 'string',
+        category_id: ['string', 'number'],
+        type: 'string'
+      }
+
+      for (const [field, type] of Object.entries(requiredFields)) {
+        if (!updatedItem[field] && updatedItem[field] !== 0) {
+          console.error(`Missing required field: ${field}`)
+          throw new Error(`Field ${field} harus diisi`)
+        }
+        if (
+          (Array.isArray(type) && !type.includes(typeof updatedItem[field])) ||
+          (!Array.isArray(type) && typeof updatedItem[field] !== type)
+        ) {
+          console.error(`Invalid type for ${field}:`, { 
+            expected: type, 
+            received: typeof updatedItem[field],
+            value: updatedItem[field]
+          })
+          throw new Error(`Tipe data ${field} tidak valid`)
+        }
+      }
+      
+
+      console.log('Sending update request with data:', {
+        id: originalItem.id,
+        ...updatedItem
       })
 
-      if (!response) {
-        throw new Error('Gagal mengupdate pengeluaran')
+      const response = await transactionAPI.updateTransaction(originalItem.id, updatedItem)
+
+      // Check if response has the expected format
+      if (!response || !response.data || !response.message) {
+        console.error('Invalid API response format:', response)
+        throw new Error('Format respons API tidak valid')
       }
+
+      console.log('Update response:', response)
 
       // Refresh expenses after successful update
       const updatedResponse = await transactionAPI.getTransactions('Pengeluaran')
@@ -156,10 +217,10 @@ const Pengeluaran = () => {
         acc[month].push({
           id: transaction.id,
           date: date.toLocaleDateString('id-ID'),
-          nominal: `Rp. ${transaction.amount.toLocaleString('id-ID')},-`,
+          nominal: `Rp. ${parseFloat(transaction.amount).toLocaleString('id-ID')},-`,
           name: transaction.transaction_name,
           category: transaction['category.name'] || 'Uncategorized',
-          category_id: transaction['category.id'] || null,
+          categoryId: transaction['category_id'] || null,
           type: transaction.type
         })
         
@@ -176,7 +237,7 @@ const Pengeluaran = () => {
         index,
         updatedItem
       })
-      setError('Gagal mengupdate pengeluaran')
+      setError(error.message || 'Gagal mengupdate pengeluaran')
     }
   }
 
@@ -291,10 +352,10 @@ const Pengeluaran = () => {
         acc[month].push({
           id: transaction.id,
           date: date.toLocaleDateString('id-ID'),
-          nominal: `Rp. ${transaction.amount.toLocaleString('id-ID')},-`,
+          nominal: `Rp. ${parseFloat(transaction.amount).toLocaleString('id-ID')},-`,
           name: transaction.transaction_name,
           category: transaction['category.name'] || 'Uncategorized',
-          categoryId: transaction['category.id'] || null,
+          categoryId: transaction['category_id'] || null,
           type: transaction.type
         })
         
@@ -330,12 +391,11 @@ const Pengeluaran = () => {
     
     Object.entries(expenseData).forEach(([month, monthData]) => {
       const filteredMonthData = monthData.filter(item => {
-        const dateParts = item.date.split('/');
-        const itemDate = new Date(
-          parseInt(dateParts[2].trim()), 
-          parseInt(dateParts[1].trim()) - 1, 
-          parseInt(dateParts[0].trim())
-        );
+        const itemDate = new Date(parseDisplayDateToISO(item.date));
+        if (isNaN(itemDate.getTime())) {
+          console.warn('Invalid item date:', item.date);
+          return false;
+        }
         
         // Date filtering - include start date
         if (startDate) {

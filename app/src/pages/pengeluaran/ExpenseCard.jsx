@@ -24,19 +24,25 @@ const DropdownMenu = ({ onEdit, onDelete }) => {
 }
 
 const EditForm = ({ item, onClose, onSave, categories }) => {
+  // Parse the date from dd/MM/yyyy to YYYY-MM-DD format
+  const parseDisplayDateToISO = (displayDate) => {
+    const [day, month, year] = displayDate.split('/');
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  };
+
   const [editData, setEditData] = useState({
     name: item.name,
     nominal: item.nominal.replace(/[^0-9]/g, ''),
-    date: new Date(item.date.split('/').reverse().join('-')).toISOString().split('T')[0],
-    categoryId: item.category_id || ''
+    date: parseDisplayDateToISO(item.date),
+    category_id: item.categoryId || ''
   })
   const [error, setError] = useState('')
 
   useEffect(() => {
     // Set the initial category ID based on available data
-    let initialCategoryId = item.category_id
+    let initialCategoryId = item.categoryId
 
-    // If we have category.name but no category_id, try to find the matching category
+    // If we have category.name but no categoryId, try to find the matching category
     if (item['category.name'] && !initialCategoryId && categories) {
       const matchingCategory = categories.find(cat => cat.name === item['category.name'])
       if (matchingCategory) {
@@ -55,7 +61,7 @@ const EditForm = ({ item, onClose, onSave, categories }) => {
     if (initialCategoryId) {
       setEditData(prev => ({
         ...prev,
-        categoryId: initialCategoryId
+        category_id: initialCategoryId
       }))
     }
   }, [item, categories])
@@ -65,7 +71,7 @@ const EditForm = ({ item, onClose, onSave, categories }) => {
     setError('')
 
     // Validate category
-    if (!editData.categoryId) {
+    if (!editData.category_id) {
       setError('Kategori harus dipilih')
       return
     }
@@ -77,15 +83,22 @@ const EditForm = ({ item, onClose, onSave, categories }) => {
       return
     }
 
+    // Validate date
+    if (!editData.date || !/^\d{4}-\d{2}-\d{2}$/.test(editData.date)) {
+      setError('Format tanggal tidak valid')
+      return
+    }
+
     try {
       const dataToSave = {
         transaction_name: editData.name,
         amount: amount,
-        transaction_date: editData.date,
-        category_id: editData.categoryId,
+        transaction_date: editData.date, // Already in YYYY-MM-DD format
+        category_id: editData.category_id,
         type: 'Pengeluaran'
       }
 
+      console.log('Saving expense with data:', dataToSave)
       await onSave(item.id, dataToSave)
       onClose()
     } catch (err) {
@@ -142,8 +155,8 @@ const EditForm = ({ item, onClose, onSave, categories }) => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
               <select
-                value={editData.categoryId}
-                onChange={(e) => setEditData({ ...editData, categoryId: e.target.value })}
+                value={editData.category_id}
+                onChange={(e) => setEditData({ ...editData, category_id: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
               >
@@ -265,7 +278,7 @@ const ExpenseRow = ({ item, onSave, onDelete, categories }) => {
     // Ensure we're sending category_id in the update
     const dataToUpdate = {
       ...updatedItem,
-      category_id: updatedItem.categoryId // Map categoryId to category_id for API
+      category_id: updatedItem.category_id // Map category_id to category_id for API
     }
     await onSave(id, dataToUpdate)
     setIsEditing(false)
