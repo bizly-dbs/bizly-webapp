@@ -54,6 +54,8 @@ export const requestPasswordReset = async (req, res) => {
     const user = await Users.findOne({ where: { email } });
     if (!user) return res.status(404).json({ error: 'Email tidak ditemukan' });
 
+    req.session.email = email;
+
     const otpInfo = await sendOTP(email);
     res.status(200).json({ message: 'OTP telah dikirim', ...otpInfo });
   } catch (err) {
@@ -62,9 +64,15 @@ export const requestPasswordReset = async (req, res) => {
 };
 
 export const verifyOTP = async (req, res) => {
-  const { email, code } = req.body;
+  const { code } = req.body;
   try {
+    const email = req.session.email;
+    if (!email) {
+      return res.status(400).json({ error: 'Email tidak ditemukan dalam sesi' });
+    }
     validateOTP(email, code);
+
+    req.session.otpVerified = true;
     res.status(200).json({ message: 'OTP valid' });
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -72,17 +80,24 @@ export const verifyOTP = async (req, res) => {
 };
 
 export const resetPassword = async (req, res) => {
-  const { email, code, newPassword } = req.body;
+  const { newPassword } = req.body;
   try {
-    validateOTP(email, code);
+    const email = req.session.email;
+    if (!email) {
+      return res.status(400).json({ error: 'Email tidak ditemukan dalam sesi' });
+    }
+
+    if( !req.session.otpVerified) {
+      return res.status(400).json({ error: 'OTP belum diverifikasi' });
+    }
 
     if (!newPassword || newPassword.length < 8) {
       return res.status(400).json({ error: 'Password minimal 8 karakter' });
     }
 
     const hash = await argon2.hash(newPassword);
-    await Users.update({ password: hash }, { where: { email } });
-
+    await Users.update({ password: hash, otp_verified: false }, { where: { email } });
+    req.session.otpVerified = false;
     res.status(200).json({ message: 'Password berhasil direset' });
   } catch (err) {
     res.status(400).json({ error: err.message });
