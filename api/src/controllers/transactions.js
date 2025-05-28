@@ -168,6 +168,16 @@ export const getTransactionById = async (req, res) => {
           model: Categories,
           attributes: ["name"],
         },
+        {
+          model: TransactionsProducts,
+          attributes: ["quantity", "price", "total_price"],
+          include: [
+            {
+              model: Products,
+              attributes: ["name"],
+            },
+          ],
+        }
       ],
       raw: true,
     });
