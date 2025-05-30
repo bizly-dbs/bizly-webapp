@@ -1,0 +1,9 @@
+PORT=3000
+DB_NAME=bizly_db
+DB_USER=postgres
+DB_PASSWORD=sekandri
+DB_HOST=localhost
+DB_PORT=5432
+GMAIL_USER=bizlydbs@gmail.com
+GMAIL_PASS=foysgczhtbfwewed
+SESSION_SECRET=Aku-Keren-Banget
