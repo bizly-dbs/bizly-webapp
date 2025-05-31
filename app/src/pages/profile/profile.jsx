@@ -3,7 +3,6 @@ import { useState, useRef } from "react";
 export default function Profile() {
   const [profile, setProfile] = useState({
     name: "Ponyo",
-    role: "Business Owner",
     email: "ponyo@gmail.com",
     avatar: "https://i.pravatar.cc/150?img=68",
   });
@@ -83,10 +82,9 @@ export default function Profile() {
 
         {/* Profile content */}
         <div className="pt-4 pb-6 px-6 flex flex-col items-center">
-          <h2 className="text-xl font-semibold text-gray-800">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
             {user.username ?? user.email?.split("@")[0]}
           </h2>
-          <p className="text-sm text-gray-500 mb-4">{profile.role}</p>
 
           {/* Email */}
           <div className="text-blue-600 text-sm font-medium">{user.email}</div>
