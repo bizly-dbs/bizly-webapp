@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Calendar } from "lucide-react";
+import { Calendar, Plus } from "lucide-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axiosInstance from "../../lib/axios";
@@ -19,6 +19,7 @@ const TambahKeluar = () => {
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(null);
   const [categories, setCategories] = useState();
+  const [newCategory, setNewCategory] = useState("");
 
   const userId = localStorage.getItem("userId");
 
@@ -36,8 +37,43 @@ const TambahKeluar = () => {
     });
   };
 
+  const handleCategorySelect = (id) => {
+    setFormData({
+      ...formData,
+      category: id,
+    });
+
+    setCategories(
+      categories.map((cat) => ({
+        ...cat,
+        selected: cat.id === id,
+      }))
+    );
+  };
+
+  const handleAddCategory = async () => {
+    if (newCategory.trim()) {
+      try {
+        const { data } = await axiosInstance.post("/categories", {
+          name: newCategory,
+          type: "Pengeluaran",
+        });
+
+        console.log(data);
+        setNewCategory("");
+        getCategories();
+        toast.success("Kategori berhasil ditambahkan");
+      } catch (error) {
+        console.log(error);
+        toast.error("Gagal menambahkan kategori");
+      }
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const selectedCategory = categories.find((c) => c.selected)?.name || "";
 
     const formattedDate = selectedDate
       ? `${selectedDate.getDate().toString().padStart(2, "0")}/${(
@@ -51,7 +87,7 @@ const TambahKeluar = () => {
       date: formattedDate,
       nominal: `Rp. ${formData.nominal},-`,
       name: formData.transactionName,
-      category: formData.category,
+      category: selectedCategory,
       type: "Pengeluaran",
     };
 
@@ -73,6 +109,7 @@ const TambahKeluar = () => {
       }
     } catch (error) {
       console.log(error);
+      toast.error("Gagal menambahkan pengeluaran");
     }
   };
 
@@ -95,7 +132,7 @@ const TambahKeluar = () => {
 
         <form onSubmit={handleSubmit}>
           <div className="mb-6">
-            <label className="block text-sm font-medium text-blue-600 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Tanggal
             </label>
             <div className="relative">
@@ -109,13 +146,13 @@ const TambahKeluar = () => {
               />
               <Calendar
                 size={20}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500 pointer-events-none"
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none"
               />
             </div>
           </div>
 
           <div className="mb-6">
-            <label className="block text-sm font-medium text-blue-600 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Jumlah Nominal
             </label>
             <input
@@ -130,7 +167,7 @@ const TambahKeluar = () => {
           </div>
 
           <div className="mb-6">
-            <label className="block text-sm font-medium text-blue-600 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Nama Transaksi
             </label>
             <input
@@ -145,42 +182,52 @@ const TambahKeluar = () => {
           </div>
 
           <div className="mb-8">
-            <label className="block text-sm font-medium text-blue-600 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Kategori
             </label>
-            <div className="relative">
-              <select
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                className={styles.inputField + " appearance-none pr-10"}
-                required
-              >
-                <option value="" disabled>
-                  Pilih Kategori
-                </option>
-                {/* <option value="Operasional">Operasional</option>
-                <option value="Belanja">Belanja</option>
-                <option value="Pembayaran">Pembayaran</option>
-                <option value="Lainnya">Lainnya</option> */}
+            <div className="border border-gray-300 rounded-lg p-4">
+              <div className="flex flex-wrap gap-2 mb-4">
                 {categories?.map((category) => (
-                  <option key={category.id} value={category.id}>
+                  <button
+                    key={category.id}
+                    type="button"
+                    onClick={() => handleCategorySelect(category.id)}
+                    className={`px-3 py-1 text-sm rounded-md flex items-center ${
+                      category.selected
+                        ? "bg-blue-500 text-white"
+                        : "bg-white text-gray-700 border border-gray-300"
+                    }`}
+                  >
+                    <span
+                      className={`w-4 h-4 rounded-full mr-2 flex items-center justify-center ${
+                        category.selected
+                          ? "bg-white text-blue-500"
+                          : "bg-blue-500 text-white"
+                      }`}
+                    >
+                      {category.selected && "✓"}
+                    </span>
                     {category.name}
-                  </option>
+                  </button>
                 ))}
-              </select>
-              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                <svg
-                  className="w-5 h-5 text-blue-500"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleAddCategory}
+                  className="text-blue-500 font-medium flex items-center text-sm"
                 >
-                  <path
-                    fillRule="evenodd"
-                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+                  <Plus size={16} className="mr-1" />
+                  Tambah Kategori
+                </button>
+                <input
+                  type="text"
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  placeholder="Nama kategori baru"
+                  className="border border-gray-300 rounded-md px-3 py-1 text-sm flex-1"
+                />
               </div>
             </div>
           </div>
