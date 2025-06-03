@@ -1,19 +1,18 @@
 import { useState, useRef } from "react";
+import ProfileAvatar from "../../components/ProfileAvatar";
 
 export default function Profile() {
   const [profile, setProfile] = useState({
     name: "Ponyo",
     email: "ponyo@gmail.com",
-    avatar: "https://i.pravatar.cc/150?img=68",
   });
 
   const fileInputRef = useRef(null);
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const handleImageClick = () => {
     fileInputRef.current.click();
   };
-
-  const user = JSON.parse(localStorage.getItem("user"));
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -41,10 +40,11 @@ export default function Profile() {
         <div className="relative -mt-16 flex justify-center">
           <div className="relative group">
             <div className="w-32 h-32 rounded-full border-4 border-white bg-white overflow-hidden">
-              <img
-                src={profile.avatar}
-                alt={profile.name}
-                className="w-full h-full object-cover"
+              <ProfileAvatar
+                name={user.username}
+                email={user.email}
+                size="lg"
+                className="w-full h-full"
               />
             </div>
 

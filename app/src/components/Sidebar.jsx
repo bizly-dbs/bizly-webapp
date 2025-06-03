@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import logoImg from "../assets/Bizly-logo.png";
+import ProfileAvatar from "./ProfileAvatar";
 
 // Import Material UI Icons
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -143,13 +144,12 @@ const Sidebar = () => {
             {/* User Profile and Logout */}
             <div className="border-t border-gray-300">
               <div className="p-4 flex items-center">
-                <div className="h-10 w-10 rounded-full bg-gray-400 flex-shrink-0 overflow-hidden">
-                  <img
-                    src="https://i.pravatar.cc/150?img=68"
-                    alt="User"
-                    className="h-full w-full object-cover"
-                  />
-                </div>
+                <ProfileAvatar 
+                  name={user.username}
+                  email={user.email}
+                  size="md"
+                  className="flex-shrink-0"
+                />
                 <div className="ml-3">
                   <p className="text-sm font-medium">
                     {user.username ?? user.email?.split("@")[0]}
