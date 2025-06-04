@@ -9,6 +9,8 @@ import transactionRoute from "./src/routes/transactionRoute.js";
 import userRoute from "./src/routes/userRoute.js";
 import transactionProductRoute from "./src/routes/transactionProductRoute.js";
 import productsRoute from "./src/routes/productsRoute.js";
+import mlRoute from "./src/routes/mlRoute.js";
+
 import cors from "cors";
 
 const app = express();
@@ -48,3 +50,4 @@ app.use("/products", productsRoute);
 app.use("/transactions", transactionRoute);
 app.use("/users", userRoute);
 app.use("/transactions-products", transactionProductRoute);
+app.use("/ml", mlRoute);
