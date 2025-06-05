@@ -9,6 +9,16 @@ import CalendarCard from "./components/CalendarCard";
 import ExpenseTrackingCard from "./components/ExpenseTrackingCard";
 import TopCard from "./components/TopCard";
 import axiosInstance from "../../lib/axios";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import BusinessHealthStatusCard from "../../components/BusinessHealthStatusCard";
+import IncomePredictionCard from "../../components/IncomePredictionCard";
+
+const healthStatusMessages = {
+  "Sehat": "Bisnis Anda dalam kondisi SEHAT. Terus pertahankan kinerja keuangan yang baik!",
+  "Cukup Sehat": "Bisnis Anda CUKUP SEHAT. Ada beberapa hal yang bisa ditingkatkan.",
+  "Perlu Penanganan Khusus": "Bisnis Anda PERLU PENANGANAN KHUSUS. Segera evaluasi keuangan Anda.",
+  "Perlu Perhatian": "Bisnis Anda PERLU PERHATIAN. Perhatikan arus kas dan pengeluaran Anda.",
+};
 
 const Dashboard = () => {
   const [transactions, setTransactions] = useState([]);
@@ -17,6 +27,13 @@ const Dashboard = () => {
   const currentDate = new Date();
   const [activeMonth, setActiveMonth] = useState(currentDate.getMonth());
   const [activeYear, setActiveYear] = useState(currentDate.getFullYear());
+  const [healthStatus, setHealthStatus] = useState(null);
+  const [healthConfidence, setHealthConfidence] = useState(null);
+  const [healthLoading, setHealthLoading] = useState(true);
+  const [healthError, setHealthError] = useState(null);
+  const [predictedIncome, setPredictedIncome] = useState([]);
+  const [predictLoading, setPredictLoading] = useState(true);
+  const [predictError, setPredictError] = useState(null);
 
   const monthNames = [
     "January",
@@ -46,7 +63,34 @@ const Dashboard = () => {
       }
     };
 
+    const fetchHealthStatus = async () => {
+      try {
+        setHealthLoading(true);
+        const res = await axiosInstance.get("/ml/analyze");
+        setHealthStatus(res.data.health_status);
+        setHealthConfidence(res.data.confidence);
+      } catch (err) {
+        setHealthError("Gagal mengambil status kesehatan bisnis.");
+      } finally {
+        setHealthLoading(false);
+      }
+    };
+
+    const fetchPrediction = async () => {
+      try {
+        setPredictLoading(true);
+        const res = await axiosInstance.get("/ml/predict");
+        setPredictedIncome(res.data);
+      } catch (err) {
+        setPredictError("Gagal mengambil prediksi pemasukan.");
+      } finally {
+        setPredictLoading(false);
+      }
+    };
+
     fetchTransactions();
+    fetchHealthStatus();
+    fetchPrediction();
   }, []);
 
   // Process transaction data for charts
@@ -247,6 +291,12 @@ const Dashboard = () => {
 
   console.log("cashFlowData", cashFlowData);
 
+  // Prepare data for prediction chart
+  const predictionChartData = predictedIncome.map((value, idx) => ({
+    name: `Hari ${idx + 1}`,
+    value: value,
+  }));
+
   if (loading)
     return <div className="text-center py-8">Loading dashboard...</div>;
   if (error)
@@ -254,6 +304,19 @@ const Dashboard = () => {
 
   return (
     <div className="bg-gray-50 p-6 min-h-screen font-['Poppins']">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <BusinessHealthStatusCard
+          healthStatus={healthStatus}
+          healthConfidence={healthConfidence}
+          healthLoading={healthLoading}
+          healthError={healthError}
+        />
+        <IncomePredictionCard
+          predictedIncome={predictedIncome}
+          predictLoading={predictLoading}
+          predictError={predictError}
+        />
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <TotalExpenseCard
           total={totalExpense}
