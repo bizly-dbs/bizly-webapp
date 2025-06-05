@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X } from 'lucide-react';
 import logo from "../assets/Bizly-logo.png";
-import illustration from "../assets/Placeholder.png";
 import fitur1 from "../assets/fitur1.png";
 import fitur2 from "../assets/fitur2.png";
 import fitur3 from "../assets/fitur3.png";
 import gambar1 from "../assets/Dashboard.png";
 import gambar2 from "../assets/Pemasukan.png";
-import gambar3 from "../assets/Pengeluaran.png";
+import gambar4 from "../assets/TambahKeluar.png";
+
 
 const scrollToSection = (id) => {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -164,7 +164,7 @@ const LandingPage = () => {
         <div className="container grid grid-cols-1 md:grid-cols-2 gap-12 items-center mx-25 mt-40 mb-30">
           {/* Ilustrasi di kiri */}
           <div className="flex justify-center md:order-1">
-            <img src={illustration} alt="Illustration" className="w-full max-w-lg" />
+            <img src={gambar1} alt="Illustration" className="w-full max-w-lg" />
           </div>
 
           {/* Teks Hero di kanan */}
@@ -174,12 +174,9 @@ const LandingPage = () => {
               Lebih Cerdas Dengan Bizly!
             </h1>
             <p className="mt-4 text-white text-lg font-300">
-              Pengelolaan keuangan yang cermat adalah kunci keberlanjutan usaha. Namun,
-              banyak pelaku UMKM kesulitan mencatat dan menganalisis keuangan karena
-              keterbatasan waktu dan sumber daya. Bizly hadir sebagai solusi digital yang
-              membantu UMKM mencatat pemasukan dan pengeluaran secara otomatis,
-              menganalisis arus kas, dan memberikan insight keuangan yang mudah
-              dipahami — agar bisnis tetap sehat dan tumbuh berkelanjutan.
+              UMKM sering kesulitan mengelola keuangan karena keterbatasan waktu dan sumber daya. 
+              Bizly adalah solusi digital yang membantu UMKM mencatat transaksi otomatis, menganalisis arus kas, 
+              dan memberikan insight keuangan yang mudah dipahami untuk mendukung pertumbuhan bisnis yang berkelanjutan.
             </p>
             <Link
               to="/login"
@@ -302,8 +299,7 @@ const LandingPage = () => {
             <div className="bg-white shadow-lg rounded-lg p-6 text-center w-full md:w-1/2 lg:w-1/2">
               <div className="aspect-w-16 aspect-h-9 rounded-lg mb-4 overflow-hidden">
                 <img 
-                  src={gambar3} 
-                  alt="Fitur OCR" 
+                  src={gambar4} 
                   className="w-full h-full object-cover"
                 />
               </div>              
@@ -359,4 +355,3 @@ const LandingPage = () => {
 };
 
 export default LandingPage;
-
