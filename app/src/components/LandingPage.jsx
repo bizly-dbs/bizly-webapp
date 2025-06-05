@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X } from 'lucide-react';
 import logo from "../assets/Bizly-logo.png";
@@ -17,6 +17,17 @@ const scrollToSection = (id) => {
 const LandingPage = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setIsScrolled(scrollPosition > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -24,44 +35,77 @@ const LandingPage = () => {
 
   const handleMobileNavClick = (id) => {
     scrollToSection(id);
-    setIsMenuOpen(false); // Close menu after clicking a navigation item
+    setIsMenuOpen(false);
   };
 
   const handleSubscribeClick = (e) => {
-    e.preventDefault(); // Prevent default form submission
-    navigate('/Register'); // Navigate to Register page
+    e.preventDefault();
+    navigate('/Register');
   };
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col font-['Poppins']">
       {/* Navbar */}
-      <header className="bg-white shadow-md py-4 fixed top-0 w-full z-50">
+      <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+        isScrolled ? 'bg-white shadow-md py-4' : 'bg-transparent py-6'
+      }`}>
         <div className="container mx-auto flex justify-between items-center px-6">
           {/* Logo */}
           <div className="flex items-center">
             <img src={logo} alt="DompetIQ Logo" className="h-10 mr-3" />
-            <h1 className="text-2xl font-bold text-[#007AFF] font-700">Bizly</h1>
+            <h1 className={`text-2xl font-bold font-700 transition-colors duration-300 ${
+              isScrolled ? 'text-[#007AFF]' : 'text-white'
+            }`}>Bizly</h1>
           </div>
 
           {/* Menu Navigasi */}
           <nav className="hidden md:flex items-center space-x-6">
-            <button onClick={() => scrollToSection("Home")} className="hover:text-[#007AFF] font-500">
+            <button 
+              onClick={() => scrollToSection("Home")} 
+              className={`hover:text-[#007AFF] font-500 transition-colors duration-300 ${
+                isScrolled ? 'text-gray-700' : 'text-white'
+              }`}
+            >
               Home
             </button>
-            <button onClick={() => scrollToSection("Fitur")} className="hover:text-[#007AFF] font-500">
+            <button 
+              onClick={() => scrollToSection("Fitur")} 
+              className={`hover:text-[#007AFF] font-500 transition-colors duration-300 ${
+                isScrolled ? 'text-gray-700' : 'text-white'
+              }`}
+            >
               Tentang
             </button>
-            <button onClick={() => scrollToSection("Tangkapan-Layar")} className="hover:text-[#007AFF] font-500">
+            <button 
+              onClick={() => scrollToSection("Tangkapan-Layar")} 
+              className={`hover:text-[#007AFF] font-500 transition-colors duration-300 ${
+                isScrolled ? 'text-gray-700' : 'text-white'
+              }`}
+            >
               Tangkapan Layar
             </button>
           </nav>
 
           {/* Login & Register */}
           <div className="hidden md:flex space-x-4">
-            <Link to="/login" className="px-4 py-2 text-white bg-[#007AFF] rounded-lg">
+            <Link 
+              to="/login" 
+              className={`px-4 py-2 rounded-lg transition-colors duration-300 ${
+                isScrolled 
+                  ? 'bg-[#007AFF] text-white hover:bg-[#007AFF]/90' 
+                  : 'bg-white text-[#007AFF] hover:bg-white/90'
+              }`}
+            >
               Masuk
             </Link>
-            <Link to="/Register" className="px-4 py-2 text-[#007AFF] border border-[#007AFF] rounded-lg">
+            <Link 
+              to="/Register" 
+              className={`px-4 py-2 rounded-lg transition-colors duration-300 ${
+                isScrolled 
+                  ? 'text-[#007AFF] border border-[#007AFF] hover:bg-[#007AFF]/10' 
+                  : 'text-white border border-white hover:bg-white/10'
+              }`}
+            >
               Daftar
             </Link>
           </div>
@@ -73,9 +117,9 @@ const LandingPage = () => {
             aria-label="Toggle menu"
           >
             {isMenuOpen ? (
-              <X className="h-6 w-6 text-[#007AFF]" />
+              <X className={`h-6 w-6 ${isScrolled ? 'text-[#007AFF]' : 'text-white'}`} />
             ) : (
-              <Menu className="h-6 w-6 text-[#007AFF]" />
+              <Menu className={`h-6 w-6 ${isScrolled ? 'text-[#007AFF]' : 'text-white'}`} />
             )}
           </button>
         </div>
@@ -84,20 +128,29 @@ const LandingPage = () => {
         {isMenuOpen && (
           <div className="md:hidden bg-white py-4 px-6 shadow-lg">
             <nav className="flex flex-col space-y-4">
-              <button onClick={() => handleMobileNavClick("Home")} className="text-left py-2 px-4 hover:bg-[#007AFF]/10 hover:text-[#007AFF] rounded-lg">
+              <button 
+                onClick={() => handleMobileNavClick("Home")} 
+                className="text-left py-2 px-4 hover:bg-[#007AFF]/10 hover:text-[#007AFF] rounded-lg text-gray-700"
+              >
                 Home
               </button>
-              <button onClick={() => handleMobileNavClick("Fitur")} className="text-left py-2 px-4 hover:bg-[#007AFF]/10 hover:text-[#007AFF] rounded-lg">
+              <button 
+                onClick={() => handleMobileNavClick("Fitur")} 
+                className="text-left py-2 px-4 hover:bg-[#007AFF]/10 hover:text-[#007AFF] rounded-lg text-gray-700"
+              >
                 Tentang
               </button>
-              <button onClick={() => handleMobileNavClick("Tangkapan-Layar")} className="text-left py-2 px-4 hover:bg-[#007AFF]/10 hover:text-[#007AFF] rounded-lg">
+              <button 
+                onClick={() => handleMobileNavClick("Tangkapan-Layar")} 
+                className="text-left py-2 px-4 hover:bg-[#007AFF]/10 hover:text-[#007AFF] rounded-lg text-gray-700"
+              >
                 Tangkapan Layar
               </button>
               <div className="flex flex-col space-y-2 pt-2 border-t border-gray-200">
-                <Link to="/login" className="py-2 px-4 text-center text-white bg-[#007AFF] rounded-lg">
+                <Link to="/login" className="py-2 px-4 text-center text-white bg-[#007AFF] rounded-lg hover:bg-[#007AFF]/90">
                   Masuk
                 </Link>
-                <Link to="/Register" className="py-2 px-4 text-center text-[#007AFF] border border-[#007AFF] rounded-lg">
+                <Link to="/Register" className="py-2 px-4 text-center text-[#007AFF] border border-[#007AFF] rounded-lg hover:bg-[#007AFF]/10">
                   Daftar
                 </Link>
               </div>
