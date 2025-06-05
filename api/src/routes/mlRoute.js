@@ -4,7 +4,7 @@ import { verifyUser } from '../middlewares/authUser.js';
 
 const router = express.Router();
 
-router.post('/analyze', verifyUser, analyzeBusiness);
-router.post('/predict', verifyUser, predictSales);
+router.get('/analyze', verifyUser, analyzeBusiness);
+router.get('/predict', verifyUser, predictSales);
 
 export default router;

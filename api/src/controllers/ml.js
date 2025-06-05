@@ -1,9 +1,15 @@
 import Transactions from '../models/transactionsModel.js';
 import axios from 'axios';
 import { Op } from 'sequelize';
+// import { format, subDays } from 'date-fns'; //
+
+// Helper: Format date to YYYY-MM-DD
+const formatDate = (date) => date.toISOString().slice(0, 10);
 
 export const analyzeBusiness = async (req, res) => {
     try {
+        if (!req.userId) return res.status(400).json({ error: 'User not authenticated' });
+
         const transactions = await Transactions.findAll({
             where: { user_id: req.userId },
             attributes: ['amount', 'type', 'transaction_date'],
@@ -16,13 +22,14 @@ export const analyzeBusiness = async (req, res) => {
         // Hitung hari rugi
         const daily = {};
         transactions.forEach(trx => {
-            if (!daily[trx.transaction_date]) daily[trx.transaction_date] = { pemasukan: 0, pengeluaran: 0 };
+            const date = formatDate(new Date(trx.transaction_date));
+            if (!daily[date]) daily[date] = { pemasukan: 0, pengeluaran: 0 };
             if (trx.type === 'Pemasukan') {
                 pemasukan += Number(trx.amount);
-                daily[trx.transaction_date].pemasukan += Number(trx.amount);
+                daily[date].pemasukan += Number(trx.amount);
             } else if (trx.type === 'Pengeluaran') {
                 pengeluaran += Number(trx.amount);
-                daily[trx.transaction_date].pengeluaran += Number(trx.amount);
+                daily[date].pengeluaran += Number(trx.amount);
             }
         });
         let jumlah_hari_rugi = 0;
@@ -37,14 +44,16 @@ export const analyzeBusiness = async (req, res) => {
         );
         res.json(response.data);
     } catch (err) {
+        console.error('analyzeBusiness error:', err);
         res.status(err.response?.status || 500).json(err.response?.data || { error: 'Terjadi kesalahan pada server' });
     }
 };
 
 export const predictSales = async (req, res) => {
     try {
+        if (!req.userId) return res.status(400).json({ error: 'User not authenticated' });
+
         const n_days = 7;
-        // Ambil transaksi pemasukan 7 hari terakhir
         const today = new Date();
         const startDate = new Date(today);
         startDate.setDate(today.getDate() - n_days + 1);
@@ -62,7 +71,7 @@ export const predictSales = async (req, res) => {
         // Kelompokkan dan jumlahkan total_sales per hari
         const salesByDate = {};
         for (const trx of transactions) {
-            const date = trx.transaction_date.toISOString().slice(0, 10);
+            const date = formatDate(new Date(trx.transaction_date));
             if (!salesByDate[date]) salesByDate[date] = 0;
             salesByDate[date] += Number(trx.amount);
         }
@@ -71,7 +80,7 @@ export const predictSales = async (req, res) => {
         for (let i = 0; i < n_days; i++) {
             const d = new Date(startDate);
             d.setDate(startDate.getDate() + i);
-            const dateStr = d.toISOString().slice(0, 10);
+            const dateStr = formatDate(d);
             salesData.push({
                 date: dateStr,
                 total_sales: salesByDate[dateStr] || 0
@@ -86,6 +95,7 @@ export const predictSales = async (req, res) => {
         );
         res.json(response.data);
     } catch (err) {
+        console.error('predictSales error:', err);
         res.status(err.response?.status || 500).json(err.response?.data || { error: 'Terjadi kesalahan pada server' });
     }
 };
