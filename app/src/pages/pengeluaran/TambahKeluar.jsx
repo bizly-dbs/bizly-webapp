@@ -112,9 +112,8 @@ const TambahKeluar = () => {
       toast.error("Gagal menambahkan pengeluaran");
     }
   };
-
   const getCategories = async () => {
-    const { data } = await axiosInstance.get(`/categories/?user_id=${userId}`);
+    const { data } = await axiosInstance.get('/categories/expense');
     console.log(data);
     setCategories(data);
   };
