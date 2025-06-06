@@ -156,9 +156,8 @@ const TambahMasuk = () => {
 
     console.log("New income entry:", newEntry);
   };
-
   const getCategories = async () => {
-    const { data } = await axiosInstance.get(`/categories/?user_id=${userId}`);
+    const { data } = await axiosInstance.get('/categories/income');
     console.log(data);
     setCategories(data);
   };
