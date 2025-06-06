@@ -30,6 +30,38 @@ export const getCategories = async (req, res) => {
     }
 }
 
+export const getIncomeCategories = async (req, res) => {
+    try{
+        const categories = await Categories.findAll({
+            where: {
+                user_id: req.userId,
+                type: "Pemasukan"
+            },
+            attributes: ["id", "name", "description"],
+            raw: true,
+        });
+        res.status(200).json(categories);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+export const getExpenseCategories = async (req, res) => {
+    try{
+        const categories = await Categories.findAll({
+            where: {
+                user_id: req.userId,
+                type: "Pengeluaran"
+            },
+            attributes: ["id", "name", "description"],
+            raw: true,
+        });
+        res.status(200).json(categories);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 export const createCategory = async (req, res) => {
     const { name, type, description } = req.body;
     try{
