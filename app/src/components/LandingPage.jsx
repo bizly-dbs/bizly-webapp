@@ -59,32 +59,35 @@ const LandingPage = () => {
           </div>
 
           {/* Menu Navigasi */}
-          <nav className="hidden md:flex items-center space-x-6">
-            <button 
-              onClick={() => scrollToSection("Home")} 
-              className={`hover:text-[#007AFF] font-500 transition-colors duration-300 ${
-                isScrolled ? 'text-gray-700' : 'text-white'
-              }`}
-            >
-              Home
-            </button>
-            <button 
-              onClick={() => scrollToSection("Fitur")} 
-              className={`hover:text-[#007AFF] font-500 transition-colors duration-300 ${
-                isScrolled ? 'text-gray-700' : 'text-white'
-              }`}
-            >
-              Tentang
-            </button>
-            <button 
-              onClick={() => scrollToSection("Tangkapan-Layar")} 
-              className={`hover:text-[#007AFF] font-500 transition-colors duration-300 ${
-                isScrolled ? 'text-gray-700' : 'text-white'
-              }`}
-            >
-              Tangkapan Layar
-            </button>
-          </nav>
+          <div className="flex justify-between px-4 lg:pl-12 lg:pr-24">
+            <nav className="hidden md:flex items-center space-x-6 ml-35">
+              <button 
+                onClick={() => scrollToSection("Home")} 
+                className={`hover:text-[#007AFF] font-500 transition-colors duration-300 ${
+                  isScrolled ? 'text-gray-700' : 'text-white'
+                }`}
+              >
+                Home
+              </button>
+              <button 
+                onClick={() => scrollToSection("Fitur")} 
+                className={`hover:text-[#007AFF] font-500 transition-colors duration-300 ${
+                  isScrolled ? 'text-gray-700' : 'text-white'
+                }`}
+              >
+                Tentang
+              </button>
+              <button 
+                onClick={() => scrollToSection("Tangkapan-Layar")} 
+                className={`hover:text-[#007AFF] font-500 transition-colors duration-300 ${
+                  isScrolled ? 'text-gray-700' : 'text-white'
+                }`}
+              >
+                Tangkapan Layar
+              </button>
+            </nav>
+          </div>
+
 
           {/* Login & Register */}
           <div className="hidden md:flex space-x-4">
@@ -160,31 +163,33 @@ const LandingPage = () => {
       </header>
 
       {/* Hero Section */}
-      <main id="Home" className="flex-grow flex items-center justify-center bg-[url('/src/assets/background.png')] bg-cover bg-center bg-no-repeat min-h-screen">
-        <div className="container grid grid-cols-1 md:grid-cols-2 gap-12 items-center mx-25 mt-40 mb-30">
-          {/* Ilustrasi di kiri */}
-          <div className="flex justify-center md:order-1">
-            <img src={gambar1} alt="Illustration" className="w-full max-w-lg" />
-          </div>
-
-          {/* Teks Hero di kanan */}
-          <div className="text-center md:text-left md:order-2">
-            <h1 className="text-5xl font-bold text-white leading-tight font-400">
+      <main id="Home" className="relative flex flex-col items-center justify-start min-h-[120vh] bg-[url('/src/assets/background.png')] bg-cover bg-center bg-no-repeat overflow-hidden">
+        <div className="container mx-auto px-6 flex flex-col items-center">
+          {/* Text Content at the top */}
+          <div className="text-center z-10 pt-20">
+            <h1 className="text-5xl font-bold text-white leading-tight font-400 mt-10">
               Atur Keuanganmu <br />
               Lebih Cerdas Dengan Bizly!
             </h1>
             <p className="mt-4 text-white text-lg font-300">
-              UMKM sering kesulitan mengelola keuangan karena keterbatasan waktu dan sumber daya. 
-              Bizly adalah solusi digital yang membantu UMKM mencatat transaksi otomatis, menganalisis arus kas, 
+              UMKM sering kesulitan mengelola keuangan karena keterbatasan waktu dan sumber daya. <br />
+              Bizly adalah solusi digital yang membantu UMKM mencatat transaksi otomatis, menganalisis arus kas, <br />
               dan memberikan insight keuangan yang mudah dipahami untuk mendukung pertumbuhan bisnis yang berkelanjutan.
             </p>
-            <Link
-              to="/login"
-              className="mt-6 inline-block px-6 py-3 text-[#007AFF] bg-white rounded-3xl hover:bg-[#007AFF] hover:text-white transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg"
-            >
-              Masuk
-            </Link>
           </div>
+
+          {/* Button centered below text */}
+          {/* <Link
+            to="/login"
+            className="mt-6 inline-block px-6 py-3 bg-blue-600 text-white rounded-3xl hover:bg-white hover:text-blue-600 transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg z-10"
+          >
+            Masuk
+          </Link> */}
+        </div>
+
+        {/* Image positioned directly below the content, centered horizontally, fully visible */}
+        <div className="w-[90%] max-w-[1200px] mx-auto mt-16 mb-20">
+          <img src={gambar1} alt="Dashboard Screenshot" className="w-full h-auto object-contain shadow-2xl rounded-lg" />
         </div>
       </main>
 
@@ -206,7 +211,10 @@ const LandingPage = () => {
 
           {/* Tombol */}
           <div className="mt-6">
-            <button className="bg-[#007AFF] text-white px-6 py-3 rounded-lg text-lg font-semibold flex items-center mx-auto">
+            <button
+              onClick={() => navigate('/login')}
+              className="bg-[#007AFF] text-white px-6 py-3 rounded-lg text-lg font-semibold flex items-center mx-auto"
+            >
               Jelajahi <span className="ml-2">→</span>
             </button>
           </div>
