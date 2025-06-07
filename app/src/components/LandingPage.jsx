@@ -5,9 +5,9 @@ import logo from "../assets/Bizly-logo.png";
 import fitur1 from "../assets/fitur1.png";
 import fitur2 from "../assets/fitur2.png";
 import fitur3 from "../assets/fitur3.png";
-import gambar1 from "../assets/Dashboard.png";
-import gambar2 from "../assets/Pemasukan.png";
-import gambar4 from "../assets/TambahKeluar.png";
+import dashboard from "../assets/Dashboard2.png";
+import gambar1 from "../assets/Masuk.png";
+import gambar2 from "../assets/TambahKeluar.png";
 
 
 const scrollToSection = (id) => {
@@ -189,7 +189,7 @@ const LandingPage = () => {
 
         {/* Image positioned directly below the content, centered horizontally, fully visible */}
         <div className="w-[90%] max-w-[1200px] mx-auto mt-16 mb-20">
-          <img src={gambar1} alt="Dashboard Screenshot" className="w-full h-auto object-contain shadow-2xl rounded-lg" />
+          <img src={dashboard} alt="Dashboard Screenshot" className="w-full h-auto object-contain shadow-2xl rounded-lg" />
         </div>
       </main>
 
@@ -280,7 +280,7 @@ const LandingPage = () => {
               <div className="bg-white shadow-lg rounded-lg p-6 text-center">
                 <div className="aspect-w-16 aspect-h-9 rounded-lg mb-4 overflow-hidden">
                   <img 
-                    src={gambar1} 
+                    src={dashboard} 
                     alt="Analisis Keuangan" 
                     className="w-full h-full object-cover"
                   />
@@ -292,7 +292,7 @@ const LandingPage = () => {
             <div className="bg-white shadow-lg rounded-lg p-6 text-center">
               <div className="aspect-w-16 aspect-h-9 rounded-lg mb-4 overflow-hidden">
                 <img 
-                  src={gambar2} 
+                  src={gambar1} 
                   alt="Mengatur Pemasukan" 
                   className="w-full h-full object-cover"
                 />
@@ -303,14 +303,16 @@ const LandingPage = () => {
   
           {/* Second row - 1 centered card */}
           <div className="flex justify-center mt-12">
-            {/* Kartu 3 - OCR */}
+            {/* Kartu 3 - Pengeluran */}
             <div className="bg-white shadow-lg rounded-lg p-6 text-center w-full md:w-1/2 lg:w-1/2">
               <div className="aspect-w-16 aspect-h-9 rounded-lg mb-4 overflow-hidden">
                 <img 
-                  src={gambar4} 
+                  src={gambar2} 
+                  alt="Mengatur Pengeluaran"
                   className="w-full h-full object-cover"
                 />
-              </div>              
+              </div>
+              <h4 className="text-2xl font-semibold text-black">Mengatur Pengeluaran</h4>              
             </div>
           </div>
         </div>
