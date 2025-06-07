@@ -26,7 +26,6 @@ const EditForm = ({ item, onSave, onCancel }) => {
   const [editData, setEditData] = useState({
     name: item.name,
     amount: item.amount.toString(),
-    description: item.description,
     date: formatDateForInput(item.rawDate),
     category: item.category,
     product: item.product,
@@ -41,7 +40,6 @@ const EditForm = ({ item, onSave, onCancel }) => {
       ...item,
       name: editData.name,
       amount: parseFloat(editData.amount),
-      description: editData.description,
       rawDate: editData.date,
       nominal: `Rp. ${parseFloat(editData.amount).toLocaleString('id-ID')},-`,
       date: formatDateForDisplay(editData.date),
@@ -111,19 +109,6 @@ const EditForm = ({ item, onSave, onCancel }) => {
                 }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Deskripsi
-              </label>
-              <input
-                type="text"
-                value={editData.description}
-                onChange={(e) =>
-                  setEditData({ ...editData, description: e.target.value })
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
               />
             </div>
             <div>
