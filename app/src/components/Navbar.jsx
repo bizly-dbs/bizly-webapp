@@ -1,19 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import SearchIcon from "@mui/icons-material/Search";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 const Navbar = ({ isSidebarOpen, toggleSidebar }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [showSearch, setShowSearch] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [pageTitle, setPageTitle] = useState("Dashboard");
 
-  // Create refs for dropdown containers
-  const searchRef = useRef(null);
+  // Create ref for dropdown container
   const profileMenuRef = useRef(null);
 
   // Update page title based on current route
@@ -40,11 +37,6 @@ const Navbar = ({ isSidebarOpen, toggleSidebar }) => {
   // Handle click outside to close dropdowns
   useEffect(() => {
     function handleClickOutside(event) {
-      // Close search if clicked outside the search container
-      if (searchRef.current && !searchRef.current.contains(event.target)) {
-        setShowSearch(false);
-      }
-
       // Close profile menu if clicked outside the profile menu container
       if (
         profileMenuRef.current &&
@@ -63,78 +55,9 @@ const Navbar = ({ isSidebarOpen, toggleSidebar }) => {
     };
   }, []);
 
-  // Handle search functionality
-  const handleSearchClick = () => {
-    setShowSearch(!showSearch);
-    // Close other menus when search is clicked
-    setShowProfileMenu(false);
-  };
-
   // Handle profile menu functionality
   const handleProfileClick = () => {
     setShowProfileMenu(!showProfileMenu);
-    // Close other menus when profile is clicked
-    setShowSearch(false);
-  };
-
-  // Handle search submission
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    const searchQuery = e.target.search.value.toLowerCase();
-    const currentPath = location.pathname;
-
-    // Get data based on current page
-    let searchResults = {};
-
-    if (currentPath === "/pemasukan") {
-      // Search income data
-      const incomeData = JSON.parse(localStorage.getItem("incomeData")) || {};
-      searchResults = Object.entries(incomeData).reduce(
-        (results, [month, items]) => {
-          const matchingItems = items.filter(
-            (item) =>
-              item.name.toLowerCase().includes(searchQuery) ||
-              item.category.toLowerCase().includes(searchQuery) ||
-              item.productName?.toLowerCase().includes(searchQuery) ||
-              item.nominal.toLowerCase().includes(searchQuery) ||
-              item.totalAmount?.toLowerCase().includes(searchQuery)
-          );
-
-          if (matchingItems.length > 0) {
-            results[month] = matchingItems;
-          }
-          return results;
-        },
-        {}
-      );
-    } else if (currentPath === "/pengeluaran") {
-      // Search expense data
-      const expenseData = JSON.parse(localStorage.getItem("expenseData")) || {};
-      searchResults = Object.entries(expenseData).reduce(
-        (results, [month, items]) => {
-          const matchingItems = items.filter(
-            (item) =>
-              item.name.toLowerCase().includes(searchQuery) ||
-              item.category.toLowerCase().includes(searchQuery) ||
-              item.nominal.toLowerCase().includes(searchQuery) ||
-              item.type.toLowerCase().includes(searchQuery)
-          );
-
-          if (matchingItems.length > 0) {
-            results[month] = matchingItems;
-          }
-          return results;
-        },
-        {}
-      );
-    }
-
-    // Store search results in localStorage
-    localStorage.setItem("searchResults", JSON.stringify(searchResults));
-
-    // Refresh the current page to show search results
-    window.location.reload();
-    setShowSearch(false);
   };
 
   const isDashboard =
@@ -172,41 +95,8 @@ const Navbar = ({ isSidebarOpen, toggleSidebar }) => {
           </h1>
         </div>
 
-        {/* Right side - Search and profile */}
+        {/* Right side - Profile */}
         <div className="flex items-center space-x-4">
-          {/* Search bar - Only show if not on dashboard */}
-          {!isDashboard && (
-            <>
-              <div className="relative hidden md:block" ref={searchRef}>
-                <form onSubmit={handleSearchSubmit}>
-                  <input
-                    type="text"
-                    name="search"
-                    placeholder="Search..."
-                    className="pl-10 pr-4 py-2 bg-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 w-64"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleSearchClick}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
-                  >
-                    <SearchIcon fontSize="small" />
-                  </button>
-                </form>
-              </div>
-
-              {/* Mobile search button */}
-              <div ref={searchRef}>
-                <button
-                  className="p-2 rounded-full hover:bg-gray-100 md:hidden"
-                  onClick={handleSearchClick}
-                >
-                  <SearchIcon fontSize="small" />
-                </button>
-              </div>
-            </>
-          )}
-
           {/* User profile button */}
           <div className="relative" ref={profileMenuRef}>
             <button
@@ -245,28 +135,6 @@ const Navbar = ({ isSidebarOpen, toggleSidebar }) => {
             )}
           </div>
         </div>
-
-        {/* Mobile search overlay - Only show if not on dashboard */}
-        {!isDashboard && showSearch && (
-          <div
-            className="absolute left-0 top-full w-full bg-white shadow-md p-4 md:hidden z-10"
-            ref={searchRef}
-          >
-            <form onSubmit={handleSearchSubmit} className="relative">
-              <input
-                type="text"
-                name="search"
-                placeholder="Search..."
-                className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                autoFocus
-              />
-              <SearchIcon
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
-                fontSize="small"
-              />
-            </form>
-          </div>
-        )}
       </div>
 
       {/* Logout Confirmation Modal */}
