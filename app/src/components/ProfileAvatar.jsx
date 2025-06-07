@@ -25,24 +25,9 @@ const ProfileAvatar = ({ name, email, size = 'md', className = '' }) => {
     lg: 'w-32 h-32 text-2xl',
   };
 
+  // Using a consistent blue color based on oklch(0.488 0.243 264.376)
   const getBackgroundColor = () => {
-    const colors = [
-      'bg-blue-500',
-      'bg-green-500',
-      'bg-purple-500',
-      'bg-pink-500',
-      'bg-indigo-500',
-      'bg-red-500',
-      'bg-yellow-500',
-      'bg-teal-500',
-    ];
-    
-    const str = name || email || '';
-    const hash = str.split('').reduce((acc, char) => {
-      return char.charCodeAt(0) + ((acc << 5) - acc);
-    }, 0);
-    
-    return colors[Math.abs(hash) % colors.length];
+    return 'bg-[#3B82F6]'; // This is the equivalent hex color for the oklch value
   };
 
   return (
