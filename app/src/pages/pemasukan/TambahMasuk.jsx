@@ -36,7 +36,6 @@ const TambahMasuk = () => {
 
   const [newCategory, setNewCategory] = useState("");
   const [newProduct, setNewProduct] = useState("");
-  const [newProductDesc, setNewProductDesc] = useState("");
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [showCategoryPopup, setShowCategoryPopup] = useState(false);
 
@@ -87,7 +86,6 @@ const TambahMasuk = () => {
       try {
         const { data } = await axiosInstance.post("/products", {
           name: newProduct,
-          description: newProductDesc,
           price: 0, // Set default price to 0 if backend requires it
         });
 
@@ -95,7 +93,6 @@ const TambahMasuk = () => {
         
         // Reset form states
         setNewProduct("");
-        setNewProductDesc("");
         setIsAddingProduct(false);
         
         // Refresh products list
@@ -278,13 +275,7 @@ const TambahMasuk = () => {
                   className="border border-gray-300 rounded-md px-3 py-2 text-sm"
                   autoFocus
                 />
-                <input
-                  type="text"
-                  value={newProductDesc}
-                  onChange={(e) => setNewProductDesc(e.target.value)}
-                  placeholder="Deskripsi produk baru"
-                  className="border border-gray-300 rounded-md px-3 py-2 text-sm"
-                />
+
                 <button
                   type="button"
                   onClick={handleAddProduct}
