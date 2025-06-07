@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import ProfileAvatar from "../../components/ProfileAvatar";
 
 export default function Profile() {
@@ -7,26 +7,7 @@ export default function Profile() {
     email: "ponyo@gmail.com",
   });
 
-  const fileInputRef = useRef(null);
   const user = JSON.parse(localStorage.getItem("user"));
-
-  const handleImageClick = () => {
-    fileInputRef.current.click();
-  };
-
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file && (file.type === "image/jpeg" || file.type === "image/png")) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfile((prev) => ({
-          ...prev,
-          avatar: reader.result,
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
@@ -38,44 +19,12 @@ export default function Profile() {
 
         {/* Profile image container */}
         <div className="relative -mt-16 flex justify-center">
-          <div className="relative group">
-            <div className="w-32 h-32 rounded-full border-4 border-white bg-white overflow-hidden">
-              <ProfileAvatar
-                name={user.username}
-                email={user.email}
-                size="lg"
-                className="w-full h-full"
-              />
-            </div>
-
-            {/* Upload button */}
-            <button
-              onClick={handleImageClick}
-              className="absolute bottom-0 right-0 bg-blue-600 rounded-full p-2 border-2 border-white hover:bg-blue-700 transition-colors"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-            </button>
-
-            {/* Hidden file input */}
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleImageChange}
-              accept=".jpg,.jpeg,.png"
-              className="hidden"
+          <div className="w-32 h-32 rounded-full border-4 border-white bg-white overflow-hidden">
+            <ProfileAvatar
+              name={user.username}
+              email={user.email}
+              size="lg"
+              className="w-full h-full"
             />
           </div>
         </div>
