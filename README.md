@@ -42,7 +42,7 @@ GMAIL_PASS=your_gmail_app_password
 ### 2. Menjalankan Backend
 
 ```bash
-cd backend
+cd api
 npm install
 nodemon index
 ```
@@ -50,7 +50,7 @@ nodemon index
 ### 3. Menjalankan Frontend
 
 ```bash
-cd frontend
+cd app
 npm install
 npm run dev
 ```
