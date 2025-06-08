@@ -24,10 +24,6 @@ psql -U postgres
 
 # Buat database baru
 CREATE DATABASE bizly_db;
-
-# (Opsional) Buat user baru dan beri hak akses
-CREATE USER bizlyuser WITH PASSWORD 'yourpassword';
-GRANT ALL PRIVILEGES ON DATABASE bizlydb TO bizlyuser;
 ```
 
 Pastikan Anda menyesuaikan file `.env` di folder `backend`:
